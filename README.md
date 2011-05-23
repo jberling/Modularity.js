@@ -52,7 +52,7 @@ like this:
 
       return Modularity.moduleDefinitions.register("article", {
 
-        // This function is run when a module is created.
+        // This function runs when a module is created.
         start: function(options) {
           var articleName = this.id.split(":")[0];
           var content = articles[options.name || articleName];
@@ -61,7 +61,7 @@ like this:
           $(this.element).fadeIn("slow");
         },
 
-        // This is run when the module is destroyed.
+        // This runs when the module is destroyed.
         destroy: function() {
           $(this.element).fadeOut("slow", function(){
             $(this.element).html("");
@@ -136,7 +136,7 @@ Those two libraries offers a good "infra structure" to base the code on.
 
 ## Road map
 Modularity.js is still in its infancy. It kind of works, but is probably not very stable. The idea is still developing
-rapidly. Hopefully its already interesting interesting enough to draw some attention and luring other developers to
+rapidly. Hopefully its already interesting enough to draw some attention and to lure other developers to
 contribute.
 
 ## Other inspiration
