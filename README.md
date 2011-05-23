@@ -109,14 +109,17 @@ Like this:
                   <li><a href="/company/products/erazor">Erazor</a></li>
                 </ul>
               </div>
-              <div>
-                .
-                .
-                .
-              </div>
             </li>
+            .
+            .
+            .
           </ul>
         </nav>
+        <div id="main-content">
+          .
+          .
+          .
+        </div>
       </body>
     </html>
 
