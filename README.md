@@ -56,15 +56,16 @@ like this:
         start: function(options) {
           var articleName = this.id.split(":")[0];
           var content = articles[options.name || articleName];
-          $(this.element).hide();
-          $(this.element).html(content);
-          $(this.element).fadeIn("slow");
+          $(this.element)
+            .hide()
+            .html(content)
+            .fadeIn("slow");
         },
 
         // This runs when the module is destroyed.
         destroy: function() {
           $(this.element).fadeOut("slow", function(){
-            $(this.element).html("");
+            $(this).html("");
           });
         }
 
