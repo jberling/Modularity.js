@@ -1,0 +1,305 @@
+//todo: add license info and better comments
+
+define(function(){
+
+  var getAccName = function() {
+    var registered = {};
+    return function(name){
+      var i = name in registered ? registered[name] : 1;
+      registered[name] = i + 1;
+      var uniqueName = name + (i > 1 ? i : "");
+      
+      return uniqueName;
+    };
+  };
+
+  var backboneLoaded = window.Backbone ? true : false;
+  
+    ////////////|||||||||||||||\\\\\\\\\\\\\
+   ////             the Core             \\\\
+  //////////////|||||||||||||||\\\\\\\\\\\\\\\
+  var Core = function(options){
+
+    var core = this;
+    
+    core.version = "0.1";
+
+    core.config = $.extend({
+      context        : window.document || null,
+      boxDefinitions : {},
+
+      attribs : {
+        routes      : "data-routes",
+        placeholder : "data-placeholder",
+        enhancer    : "data-enhancer"
+        //enhancerId  : "data-enhancer-id"
+      }
+    }, options);
+    
+    var getName = getAccName();
+
+    ////// placeholder functionality \\\\\\\\\\\\
+    
+    core._currentPlaceholders = {};
+
+    core.Placeholder = function(jsonStr, el){
+      var holder  = this;
+      var key     = (el || {}).id || getName("placeholder");
+      var options = getModuleSpecifications(el, jsonStr);
+
+      holder.routeActions = {};
+
+      for(var key in options) {
+        
+      }
+
+      core._currentPlaceholders[key] = holder;
+    };
+
+
+    /////// module functionality \\\\\\\\
+
+    // [ { moduleName : { options : {}, routes: {} } }, { moduleName2: { options: {}, routes: {} } }]
+    var getModuleSpecifications = function(el, str){
+
+      var object = JSON.parse(str);
+      var specifications;
+
+      var getPath = function(key){
+        var path     = [],
+            splitted = key.split(":");
+
+        switch(splitted.length){
+          case 1:
+            path[0] = "";
+            path[1] = splitted;
+          break;
+          case 2:
+            path = splitted;
+          break;
+          default:
+            throw new Error("The module name, " + key  + ", is in the wrong format");
+        }
+
+        return { box : path[0], module : path[1]}
+      };
+
+      var toModuleSpec = function(obj) {
+        var moduleKey;
+        var options = {};
+        var routes  = {};
+
+        if (typeof obj === "string") {
+          moduleKey = obj;
+        } else {
+          for (var key in obj){
+            moduleKey = key;
+            options   = obj[key];
+          }
+        }
+        
+        return {
+          key     : moduleKey,
+          path    : getPath(moduleKey),
+          options : options,
+          routes  : routes,
+          element : el
+        }
+      };
+
+      if (object instanceof Array) {
+        specifications = $.map(object, function(spec){
+          return toModuleSpec(spec);
+        });
+      } else {
+        specifications = [ toModuleSpec(object) ];
+      }
+
+      return specifications;
+    };
+
+    var validateSpecification = function(specification){
+      var valid = "key" in specification && "path" in specification && "box" in specification.path &&
+        "module" in specification.path && "options" in specification && "routes" in specification &&
+        "element" in specification;
+      if (!valid) throw new Error("Invalid module specification");
+    };
+
+    core._currentModules = {};
+
+    core.attributeToModules = function(element, attributeString){
+      var specifications = getModuleSpecifications(element, attributeString);
+      core.createModules(specifications);
+    };
+
+    core.createModules = function(specifications){
+      for(var i = 0, max = specifications.length; i < max; i++){
+        core.createModule(specifications[i], i);
+      }
+    };
+
+    core.createModule = function(specification, index){
+      validateSpecification(specification);
+      var ModuleDefinition = function(){
+        var BoxDefinition = core.config.boxDefinitions[specification.path.box];
+        if (!BoxDefinition)
+          throw new Error("The box definition, " + specification.path.box + ", was not found");
+
+        var Def = BoxDefinition.moduleDefinitions.get(specification.path.module);
+        if (Def)
+          return Def;
+        else
+          throw new Error("The module definition " + specification.path.module + " doesn't exist");
+      }();
+
+      var sandbox = new core.config.boxDefinitions[specification.path.box](core);
+
+      var elId = (specification.element || {id:"none"}).id;
+      var moduleId = getName(elId + "_" + specification.path.module);
+
+      var newModule = new ModuleDefinition(
+        sandbox,
+        { id: moduleId, element: specification.element },
+        specification.options
+      );
+
+      core._currentModules[moduleId] = newModule;
+
+      return newModule;
+    };
+
+    /////// controller functionality \\\\\\\
+
+    core._currentController;
+
+    var createController = function (routes) {
+      var Controller = function(){
+        var extensions = function(){
+          var ext = {};
+          for(var key in routes){
+            var act = routes[key]
+            ext[act] = function(){};
+          }
+          ext.routes = routes;
+          ext.initialize = function(placeholders){
+            this.placeholders = placeholders;
+          };
+          return ext;
+        }();
+        return Backbone.Controller.extend(extensions);
+      }();
+
+      var newController = new Controller(core._currentPlaceholders);
+
+      core._currentController = newController;
+
+      return newController;
+    };
+
+
+    /////// parseContext \\\\\\
+
+    core.parseContext = function () {
+      var enhancerAttribute    = core.config.attribs.enhancer,
+          enhancerSelector     = "[" + enhancerAttribute + "]",
+          placeholderAttribute = core.config.attribs.placeholder,
+          placeholderSelector  = "[" + placeholderAttribute + "]",
+          routes;
+
+      $(enhancerSelector, core.config.context).each(function(){
+        //var specificationString = $(this).attr(enhancerAttribute)
+        //core.createModule(get);
+        core.attributeToModules($(this).get(0), $(this).attr(enhancerAttribute));
+      });
+
+      $(placeholderSelector, core.config.context).each(function(){
+        new core.Placeholder($(this).attr(placeholderAttribute), this);
+      });
+
+      if(backboneLoaded) {
+        var routesE   = core.config.context || window.document.body,
+            routesStr = $(routesE).attr(core.config.attribs.routes);
+
+        if(routesStr) {
+          routes = getModuleSpecifications(null, routesStr);
+          createController(routes);
+        }
+      }
+    };
+  };
+
+  // Stolen from backbone, thanks!
+  var inherits = function() {
+    var ctor = function(){};
+
+    return function(parent, protoProps, staticProps) {
+      var child;
+
+      if (protoProps && protoProps.hasOwnProperty('constructor')) {
+        child = protoProps.constructor;
+      } else {
+        child = function(){ return parent.apply(this, arguments); };
+      }
+
+      ctor.prototype = parent.prototype;
+      child.prototype = new ctor();
+
+      if (protoProps)  $.extend(child.prototype, protoProps);
+      if (staticProps) $.extend(child, staticProps);
+
+      child.prototype.constructor = child;
+
+      child.__super__ = parent.prototype;
+
+      return child;
+    };
+
+  }();
+
+  ////////// Sandbox functionality \\\\\\\\\
+
+  var staticSandboxExtensions = function(){
+
+    var DefaultModuleDefinition = function(box, properties, options){
+      var module = this;
+
+      $.extend(module, properties);
+
+      if(module.start) {
+        module.start(box, properties.element, options);
+      }
+    };
+
+    return {
+      _DefaultModule : DefaultModuleDefinition,
+      moduleDefinitions : function(){
+        var definitions = {};
+        return {
+          get : function(key){
+            return definitions[key];
+          },
+          set : function(key, extensions, staticExtensions){
+            var Definition = inherits(DefaultModuleDefinition, extensions, staticExtensions);
+            definitions[key] = Definition;
+            return Definition;
+          }
+        };
+      }()
+    };
+    
+  };
+
+  Core._DefaultSandboxDefinition = inherits(function(core){
+    var self        = this;
+    var modInstance = null;
+    self.core = null;
+  });
+
+  Core.newSandboxDefinition = function(ext, staticExt){
+    var static = $.extend(staticSandboxExtensions(), staticExt);
+    return inherits(Core._DefaultSandboxDefinition, ext, static);
+  };
+  
+  return Core;
+
+});

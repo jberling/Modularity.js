@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>Enhancer/Module Tests</title>
+  
+  <link rel="stylesheet" type="text/css" href="../../admin-static/test/qunit.css"/>
+
+  <script src="scripts/lib/qunit.js"></script>
+  <script src="scripts/lib/jquery.js"></script>
+  <script src="scripts/lib/underscore.js"></script>
+  <script src="scripts/lib/backbone.js"></script>
+  <script src="scripts/lib/require.js"></script>
+
+  <script>
+
+    require([
+        "scripts/Modularity"
+      ],
+
+      function(Modularity){
+
+        require.ready(function(){
+
+          var modularity;
+
+          module("Basic functionality", {
+
+            setup: function(){
+              modularity = new Modularity();
+
+              Modularity.moduleDefinitions.register("foo-module", {
+                prepare: function(){
+                  this.prepared = true;
+                },
+                start: function(options){
+                  this.started  = options.started;
+                  this.extended = options.extended;
+                }
+              });
+
+              var FooModule = Modularity.moduleDefinitions.get("foo-module");
+              new FooModule(modularity, "my-module", {
+                page    : "test-page",
+                options : {extended:true}
+              }).start({ started : true });
+            },
+
+            teardown: function(){
+              modularity = undefined;
+              Modularity.reset();
+            }
+
+          });
+
+          test("Register module definition", function(){
+            ok(Modularity.moduleDefinitions.get("foo-module"));
+          });
+
+          test("Register module", function(){
+            ok(modularity.modules["my-module"]);
+          });
+
+          test("Module id is set", function(){
+            ok(modularity.modules["my-module"].id, "my-module");
+          });
+
+          test("Context is set", function(){
+            equals(modularity.modules["my-module"].context.page, "test-page");
+          });
+
+          test("prepare is run", function(){
+            ok(modularity.modules["my-module"].prepared);
+          });
+
+          test("Start module", function(){
+            ok(modularity.modules["my-module"].started);
+          });
+
+          test("Don't start module twice", function(){
+            var foo = modularity.modules["my-module"];
+            foo.start({ started: "twice"});
+            equals(foo.started, true);
+          });
+
+          test("Context.options is extended by options when module is started", function(){
+            ok(modularity.modules["my-module"].extended);
+          });
+
+          ///////////////////////////////////
+
+          module("ModuleDefinition functionality", {
+            setup: function(){
+              Modularity.moduleDefinitions.register("linkifier", {}, {
+                dataAttribute : "linkify"
+              });
+            },
+            teardown: function(){
+              Modularity.reset();
+            }
+          });
+
+          test("Module is linked to a data attribute", function(){
+            equals(Modularity.dataAttributes.linkify, "linkifier");
+          });
+
+          ///////////////////////
+
+          var preparedModules;
+
+          module("Declarative bindings", {
+            setup : function(){
+              Modularity.moduleDefinitions.register("call-me", {
+                start: function(options, context){
+                  this.name    = options.name;
+                }
+              }, { dataAttribute : "call-me" });
+              modularity = new Modularity({ context: $("#qunit-fixture").get(0) });
+              modularity.parseContext();
+            },
+            teardown: function(){
+              modularity = undefined;
+              Modularity.reset();
+            }
+          });
+
+          test("Module specification is created, but the module is not created", function(){
+            ok(modularity.moduleSpecs["sixten:call-me"]);
+            equals(modularity.moduleSpecs["sixten:call-me"].options.name, "Sixten");
+            ok(modularity.modules["sixten:call-me"] === undefined);
+          });
+
+          test("Module is created, started, options is parsed and context is set", function(){
+            modularity.createSpecifiedModules();
+            equals(modularity.modules["sixten:call-me"].name, "Sixten");
+            equals(modularity.modules["sixten:call-me"].element.id, "sixten");
+          });
+          
+        });
+      }
+    );
+
+  </script>
+
+</head>
+
+<body>
+
+  <h1 id="qunit-header">Modularity.js Tests</h1>
+  <p>
+    Tests the basic Modularity.js functionality.
+  </p>
+
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+
+  <div id="qunit-fixture">
+
+    <div id="sixten" data-call-me='{ "name" : "Sixten" }'></div>
+    <div id="ove"    data-call-me='{ "name" : "Ove"    }'></div>
+    <div id="kurt"   data-call-me='{ "name" : "Kurt"   }'></div>
+
+  </div>
+
+</body>
+</html>

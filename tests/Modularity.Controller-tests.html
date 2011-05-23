@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>jsMod.Controller-tests</title>
+  <link rel="stylesheet" type="text/css" href="../../admin-static/test/qunit.css"/>
+
+  <script src="scripts/lib/qunit.js"></script>
+  <script src="scripts/lib/jquery.js"></script>
+  <script src="scripts/lib/underscore.js"></script>
+  <script src="scripts/lib/backbone.js"></script>
+  <script src="scripts/lib/require.js"></script>
+
+  <script>
+
+    require([
+        "scripts/Modularity",
+        "scripts/Modularity.Controller"
+      ],
+
+      function(Modularity){
+
+        require.ready(function(){
+
+          var modularity;
+
+          Modularity.moduleDefinitions.register("call-me", {
+            start: function(options, context){
+              this.name    = options.name;
+            },
+            status: function(str) {
+              this.currentStatus = str;
+            }
+          }, { dataAttribute : "call-me" });
+          modularity = new Modularity({ context: $("#qunit-fixture").get(0) });
+          modularity.parseContext();
+          modularity.startController("test-controller");
+
+          window.Modularity = Modularity;
+          window.modularity = modularity;
+
+          test("Register Controller", function(){
+            ok(modularity.modules["test-controller:controller"]);
+          });
+
+          test("The routes are registered", function(){
+            ok(modularity.modules["test-controller:controller"].backboneController.routes.all);
+            ok(modularity.modules["test-controller:controller"].backboneController._all);
+            ok(modularity.modules["test-controller:controller"].backboneController.routes["ove/:status"]);
+            ok(modularity.modules["test-controller:controller"].backboneController["_ove/:status"]);
+          });
+
+          test("Module should be started, regardless of route", function(){
+            equals(modularity.modules["kurt:call-me"].name, "Kurt");
+          });
+
+          asyncTest("Module should only be created and started on specified routes", function(){
+            modularity.modules["test-controller:controller"].backboneController.bind("route:_sixten",
+              function(){
+              ok(!modularity.modules["ove:call-me"], "ove:call-me shold not extist");
+              ok(modularity.modules["sixten:call-me"], "sixten:call-me shold extist");
+              ok(modularity.modules["sixten:call-me"].element, "element is set");
+              start();
+            });
+          });
+
+          asyncTest("Module should be deleted if not the specified route is active", function(){
+            modularity.modules["test-controller:controller"].backboneController.bind("route:_ove",
+              function(){
+              ok(modularity.modules["ove:call-me"], "ove:call-me shold extist");
+              ok(!modularity.modules["sixten:call-me"], "sixten:call-me shold not extist");
+              start();
+            });
+          });
+
+          asyncTest("Module method should be called upon with parameters", function(){
+            modularity.modules["test-controller:controller"].backboneController.bind("route:_ove/:status",
+              function(){
+              equals(modularity.modules["ove:call-me"].currentStatus, "ok");
+              start();
+            });
+          });
+
+          asyncTest("Module is destroyed", function(){
+            ok(false, "Implement test");
+            start();
+          });
+
+        });
+      }
+    );
+
+  </script>
+
+</head>
+
+<body>
+
+  <h1 id="qunit-header">Modularity.Controller-tests</h1>
+  <p>
+    Tests Controller functionality.
+  </p>
+
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+
+  <ol>
+    <li><a href="#sixten">click</a></li>
+    <li><a href="#ove">click</a></li>
+    <li><a href="#ove/ok">click</a></li>
+  </ol>
+
+
+  <div id="qunit-fixture">
+    <div id="test-controller" data-controller='{
+      "all"         : [ "sixten:call-me", "ove:call-me" ],
+      "sixten"      : [ "sixten:call-me" ],
+      "ove"         : [ "ove:call-me" ],
+      "ove/:status" : [ "ove:call-me.status" ]
+    }'>
+      
+      <div id="sixten" data-call-me='{ "name" : "Sixten" }'></div>
+      <div id="ove"    data-call-me='{ "name" : "Ove"    }'></div>
+      <div id="kurt"   data-call-me='{ "name" : "Kurt"   }'></div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
