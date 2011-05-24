@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Modularity.js&mdash;documentation</title>
+  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.3.0/build/cssreset/reset-min.css"/>
+  <link href="style/main.css" rel="stylesheet" type="text/css"/>
+  <link href="style/magula.css" rel="stylesheet" type="text/css"/>
+  <script src="scripts/lib/jquery.js"></script>
+  <script src="scripts/lib/underscore.js"></script>
+  <script src="scripts/lib/backbone.js"></script>
+  <script src="scripts/lib/highlight.pack.js"></script>
+  <script data-main="scripts/bootstrap" src="scripts/lib/require.js"></script>
+</head>
+<body id="main-controller" data-controller='{
+  ""                        : [ "intro:article" ],
+  "module"                  : [ "module:article" ],
+  "controller"              : [ "controller:article" ],
+  "module-library"          : [ "module-library:article" ],
+  "progressive-enhancement" : [ "progressive-enhancement:article" ],
+  "roadmap"                 : [ "roadmap:article" ],
+  "change-log"              : [ "change-log:article" ]
+  }'>
+
+  <div id="page">
+
+    <header>
+      <h1>Modularity.js</h1>
+    </header>
+
+    <nav>
+      <h1>Content</h1>
+      <ul>
+        <!-- idea! <a href="/module" data-js-link='{ "hash" : "module" }'>The Module</a> -->
+        <li><a href="#">Introduction</a></li>
+        <li><a href="#progressive-enhancement">Progressive enhancement</a></li>
+        <li><a href="#module">The Module</a></li>
+        <li><a href="#controller">The Controller</a></li>
+        <li><a href="#module-library">Module library</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#change-log">Change Log</a></li>
+        <li><a href="https://github.com/Jonasson/Modularity.js">Download</a></li>
+      </ul>
+    </nav>
+
+    <section id="content">
+      <article id="intro" data-article='{}'></article>
+      <article id="progressive-enhancement" data-article='{}'></article>
+      <article id="module" data-article='{}'></article>
+      <article id="controller" data-article='{}'></article>
+      <article id="module-library" data-article='{}'></article>
+      <article id="roadmap" data-article='{}'></article>
+      <article id="change-log" data-article='{}'></article>
+    </section>
+
+    <footer>
+      <p>By Johan Jonasson</p>
+    </footer>
+
+  </div>
+
+</body>
+</html>

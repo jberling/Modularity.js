@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Intro</title>
+</head>
+<body>
+
+  <h1>Introduction</h1>
+
+  <p>One challenge when developing JavaScript heavy web sites/applications is to organize them in a good way.
+  Modularity.js approaches this problem with the help of a couple of great JavaScript projects and then add some own ideas
+  on top of that.</p>
+
+  <h2>About this documentation</h2>
+  <p>
+    This site is built with Modularity.js, and are in itself an example of how Modularity.js works. Please, take a look
+    at the source if you are curious and want an example.
+  </p>
+  <p>
+    Just as the project itself, this documentation is in a rough state. Expect a lot of Swenglish and quirky behavior...
+  </p>
+
+  <h2>Declarative</h2>
+  <p>The idea is to declare more things in your markup. This is an example:</p>
+
+  <pre>
+    <code class="html">&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;title&gt;Silly Example&lt;/title&gt;
+    .
+    .
+    .
+    &lt;script data-main="scripts/bootstrap.js" src="scripts/require.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;!-- The routes below is handled by a Backbone.js controller --&gt;
+  &lt;body id="controller" data-controller='{
+    ""            : [ "welcome:article" ],
+    "about"       : [ "about:article" ],
+    "inspiration" : [ "inspiration:article" ]
+  }'&gt;
+    &lt;div id="page"&gt;
+      &lt;!-- this module turns the menu into a dropdown menu.
+           It's unaffected by the controller. --&gt;
+      &lt;nav data-menu='{ "effect": "slide" }'&gt;
+        &lt;ul&gt;
+          &lt;li&gt;&lt;a href="#"&gt;Welcome&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#about"&gt;About&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href="#inspiration"&gt;Inpsiration&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/nav&gt;
+
+      &lt;!--
+        These divs are bound to an article module. The controller decides if
+        they should be visible or not.
+        The module checks the div id to decide which content to load.
+      --&gt;
+      &lt;div id="welcome" data-article='{}'&gt;&lt;/div&gt;
+      &lt;div id="about" data-article='{}'&gt;&lt;/div&gt;
+      &lt;div id="inspiration" data-article='{}'&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+  </pre>
+
+  <h2>Dependencies</h2>
+  <p>
+    The goal has been to minimize the dependencies to a minimum, but at this stage Modularity.js is dependent on these
+    four libraries, all good in their own way and hard to be without.
+  </p>
+  <ul>
+    <li>
+      <h3><a href="http://requirejs.org/">RequireJS</a></h3>
+      <p>RequireJS allows you to divide your project into smaller parts in a clever way.</p>
+    </li>
+    <li>
+      <h3><a href="http://documentcloud.github.com/backbone/">Backbone.js</a></h3>
+      <p>Backbone.js is a great project. Modularity.js adds a more modular thinking to the mix.</p>
+    </li>
+    <li>
+      <a href="http://documentcloud.github.com/underscore/">Underscore.js</a>
+      <p>A collection of handy functions.</p>
+    </li>
+    <li>
+      <h3><a href="http://jquery.com/">jQuery</a></h3>
+      <p>Great DOM manipulation.</p>
+    </li>
+  </ul>
+
+  <h2>Other inspiration</h2>
+  <ul>
+    <li>
+      <a href="http://developer.yahoo.com/yui/theater/video.php?v=zakas-architecture">Zakas: Modular architecture</a>
+    </li>
+  </ul>
+
+
+</body>
+</html>

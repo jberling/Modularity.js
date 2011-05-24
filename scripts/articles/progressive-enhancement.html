@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <title>Modularity.js&mdash;The Module</title>
+  <script>
+    // add a redirect to index.html#progressive-enhancement
+  </script>
+</head>
+<body>
+  <h1>Progressive enhancement<br/>I'm not writing a single-page application!</h1>
+  <p>If you are writing a more traditional web site, Modularity.js can still be an interesting choice. You don't need to
+    use the controller. Just use the data-attribute feature of Modularity.js and enjoy the simplified development.</p>
+  <pre>
+    <code class="html">&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;title&gt;Enhance me&lt;/title&gt;
+    .
+    .
+    .
+    &lt;script data-main="scripts/main.js" src="scripts/require.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;nav data-mega-dropdown='{ "effect" : "fade" }'&gt;'
+      &lt;h1&gt;Navigation&lt;/h1&gt;
+      &lt;ul&gt;
+        &lt;li&gt;
+          &lt;a href="/"&gt;Home&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+          &lt;a href="/company"&gt;The Company&lt;/a&gt;
+          &lt;div&gt;
+            &lt;h2&gt;About&lt;/h2&gt;
+            &lt;ul&gt;
+              &lt;li&gt;&lt;a href="/company/today"&gt;Today&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href="/company/history"&gt;History&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href="/company/future"&gt;Future&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;h2&gt;Products&lt;/h2&gt;
+            &lt;ul&gt;
+              &lt;li&gt;&lt;a href="/company/products/mega-mover"&gt;Mega Mover&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href="/company/products/explorer"&gt;Explorer&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href="/company/products/erazor"&gt;Erazor&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/div&gt;
+        &lt;/li&gt;
+        .
+        .
+        .
+      &lt;/ul&gt;
+    &lt;/nav&gt;
+    &lt;div id="main-content"&gt;
+      .
+      .
+      .
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+  </pre>
+</body>
+</html>

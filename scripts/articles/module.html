@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <title>Modularity.js&mdash;The Module</title>
+  <script>
+    // add a redirect to index.html#module
+  </script>
+</head>
+<body>
+  <h1>The Module</h1>
+  <p>The module is central to Modularity.js. It's based on this pattern.</p>
+  <pre>
+    <code class="javascript">define([
+  "scripts/lib/Modularity",
+  "templates/collection"
+  ], function(Modularity, collection) {
+
+  return Modularity.moduleDefinitions.register("article", {
+
+    // This function runs when a module is created.
+    start: function(options) {
+      var articleName = this.id.split(":")[0];
+      var content = articles[options.name || articleName];
+      $(this.element)
+        .hide()
+        .html(content)
+        .fadeIn("slow");
+    },
+
+    // This runs when the module is destroyed.
+    destroy: function() {
+      $(this.element).fadeOut("slow", function(){
+        $(this).html("");
+      });
+    }
+
+  }, { dataAttribute: "article" });
+
+});</code>
+  </pre>
+</body>
+</html>
