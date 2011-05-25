@@ -1,8 +1,9 @@
 require([
-    "lib/Modularity",
-    "lib/Modularity.Controller",
-    "modules/article"
-  ], function(Modularity, Controller){
+    "modules/Modularity",
+    "modules/Modularity.Controller",
+    "modules/Modularity.Article",
+    "modules/Modularity.JsHref"
+  ], function(Modularity){
   
   $(function(){
     var modularity = new Modularity();

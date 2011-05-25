@@ -1,0 +1,28 @@
+define(["lib/Modularity", "articles/articles"], function(Modularity, articles) {
+
+  return Modularity.moduleDefinitions.register("article", {
+
+    start: function(options) {
+      var articleName = this.id.split(":")[0];
+      var content = articles[options.name || articleName];
+      $(this.element)
+        .css("opacity", 0)
+        .css("position", "absolute")
+        .html(content)
+        .animate({opacity:1}, 500, function(){
+          $(this).css("position", "relative");
+        });
+      hljs.initHighlighting();
+    },
+
+    destroy: function() {
+      $(this.element)
+        .css("position", "absolute")
+        .animate({opacity:0}, 500, function(){
+          $(this).html("");
+        });
+    }
+
+  }, { dataAttribute: "article" });
+
+});

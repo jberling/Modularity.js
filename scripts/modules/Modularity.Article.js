@@ -1,10 +1,8 @@
-define(["lib/Modularity", "articles/articles"], function(Modularity, articles) {
-  var i = 0;
+define(["./Modularity", "articles/articles"], function(Modularity, articles) {
+
   return Modularity.moduleDefinitions.register("article", {
 
     start: function(options) {
-      console.log("article start, %i", i);
-      i++;
       var articleName = this.id.split(":")[0];
       var content = articles[options.name || articleName];
       $(this.element)
