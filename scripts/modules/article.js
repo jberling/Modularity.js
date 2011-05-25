@@ -9,18 +9,14 @@ define(["lib/Modularity", "articles/articles"], function(Modularity, articles) {
       var content = articles[options.name || articleName];
       $(this.element)
         .hide()
-        .css("position", "absolute")
         .html(content)
-        .fadeIn("slow", function(){
-          $(this).css("position", "relative");
-        });
+        .fadeIn("slow");
       hljs.initHighlighting.called = false;
       hljs.initHighlighting();
     },
 
     destroy: function() {
       $(this.element)
-        .css("position", "absolute")
         .fadeOut("slow", function(){
           $(this).html("");
         });

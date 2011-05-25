@@ -55,7 +55,7 @@ nav h1 {
 
 #content > article {
   padding: 30px 30px 45px; margin-bottom: 20px;
-  display: none;
+  display: none; position: absolute;
   width: 640px;
   min-height: 300px;
   background: white;
