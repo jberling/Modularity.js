@@ -11,8 +11,60 @@
   <h1>The Core</h1>
 
   <p class="intro">
-    
+    The core of Modularity.js is the Modularity.js file. It contains the <span class="code">Modularity</span> function
+    which is a constructor. Conceptually it can be said to be a class with static members that you use sometimes, and
+    sometimes you use it to instantiate an object.
   </p>
+  <p>
+    The code below is copied from <em>bootstrap.js</em>. This file is used by this site to "kickstart" Modularity.js.
+    <span class="code">require</span> is part of RequireJS, and you can <a href="http://requirejs.org/docs/start.html">
+    read about it here</a>.
+  </p>
+  <p>
+    In the example below an object, <span class="code">modularity</span>, is created by
+    <span class="code">Modularity</span>. Its method <span class="code">parseContext</span> is used to extract the module
+    specifications from the page. Finally <span class="code">startController</span> is called with the argument
+    "main-controller". This method is a special one, since it's added to <span class="code">modularity</span> by the
+    controller module.
+  </p>
+
+  <pre><code class="javascript">require([
+    "modules/Modularity",
+    // The modules should be placed at the end of the array
+    // if you don't want to tie them to a parameter.
+    "modules/Modularity.Controller",
+    "modules/Modularity.Article",
+    "modules/Modularity.JsHref"
+  ], function(Modularity){
+
+  $(function(){
+    var modularity = new Modularity();
+    window.modularity = modularity;
+    modularity.parseContext();
+    modularity.startController("main-controller");
+  });
+
+});</code></pre>
+
+  <p>
+    If no controller module is used, the modules must be created from the specifications in another way. It's done via
+    <span class="code">createSpecifiedModules</span>, as in the example below.
+  </p>
+
+  <pre><code class="javascript">require([
+    "scripts/Modularity",
+    "scripts/Modularity.JsHref"
+  ],
+
+  function(Modularity){
+
+    require.ready(function(){
+      var modularity = new Modularity();
+      modularity.parseContext();
+      modularity.createSpecifiedModules();
+    });
+  }
+);</code></pre>
 
 </body>
 </html>
