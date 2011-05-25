@@ -13,6 +13,7 @@
 </head>
 <body id="main-controller" data-controller='{
   ""                        : [ "intro:article" ],
+  "core"                    : [ "core:article" ],
   "module"                  : [ "module:article" ],
   "module-library"          : [ "module-library:article" ],
   "progressive-enhancement" : [ "progressive-enhancement:article" ],
@@ -39,6 +40,12 @@
           <a id="prog-link" href="scripts/articles/progressive-enhancement.html"
              data-js-href='{ "href" : "#progressive-enhancement" }'>
             Progressive enhancement
+          </a>
+        </li>
+        <li>
+          <a id="module-link" href="scripts/articles/core.html"
+             data-js-href='{ "href" : "#core" }'>
+            The Core
           </a>
         </li>
         <li>
@@ -76,6 +83,7 @@
     <section id="content">
       <article id="intro" data-article='{}'></article>
       <article id="progressive-enhancement" data-article='{}'></article>
+      <article id="core" data-article='{}'></article>
       <article id="module" data-article='{}'></article>
       <article id="module-library" data-article='{}'></article>
       <article id="roadmap" data-article='{}'></article>

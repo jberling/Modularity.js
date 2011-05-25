@@ -10,7 +10,22 @@
 
   <h1>The Module</h1>
 
-  <p>The module is central to Modularity.js. It's based on the pattern below.</p>
+  <p>The module is central to Modularity.js.</p>
+
+  <p>
+    Typically a module is created via the <span class="code">parseContext</span> method. If so, its <span class="code">
+    element</span> property will be set. It will have the value of the element with the custom data attribute. This
+    element might function as a container suitable to render content inside, but it might also have content inside it
+    already.
+  </p>
+  <p>
+    A module that affects content already rendered inside an element is called an <em>enhancer</em>, and is associated
+    with the concept of <a href="scripts/articles/progressive-enhancement.html" data-js-href="#progressive-enhancement">
+    progressive enhancement</a>.
+  </p>
+
+  <h2>Pattern</h2>
+  <p>It's based on the pattern below.</p>
   
   <pre><code class="javascript">define([
   "scripts/lib/Modularity",
@@ -32,8 +47,25 @@
     }
 
   }, { dataAttribute: "article" });
-
 });</code></pre>
+
+  <p>
+    The <span class="code">start</span> function is run when a module is started. Technically a module can be created
+    (instantiated) without being started, but in practice it is started when it is created.
+  </p>
+  <p>
+    When it's time to get rid of the module, the destroy function runs. Use this one to leave as small footprint as
+    possible.
+  </p>
+
+  <h2>Specification</h2>
+  <p>
+    The custom data attributes is used to create a module specification. The module specification can be used several
+    times during a page lifetime. Take this documentation as an example. Every page is a module. When I choose to navigate
+    to another page in the menu to the left, the current article (module) is destroyed and the new article is created
+    and started. If I go back to the previous page the current article will be destroyed and a new article will be created
+    from the same spec as the original article.
+  </p>
 
 </body>
 </html>
