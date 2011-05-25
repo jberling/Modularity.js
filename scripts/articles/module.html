@@ -7,32 +7,28 @@
   </script>
 </head>
 <body>
+
   <h1>The Module</h1>
-  <p>The module is central to Modularity.js. It's based on this pattern. It will be explained more thoroughly later on,
-  promise...</p>
+
+  <p>The module is central to Modularity.js. It's based on the pattern below.</p>
   
   <pre><code class="javascript">define([
   "scripts/lib/Modularity",
-  "templates/collection"
-  ], function(Modularity, collection) {
+  "some/other/file"
+  ], function(Modularity, other) {
 
-  return Modularity.moduleDefinitions.register("article", {
+  return Modularity.moduleDefinitions.register("module-name", {
 
-    // This function runs when a module is created.
     start: function(options) {
-      var articleName = this.id.split(":")[0];
-      var content = articles[options.name || articleName];
-      $(this.element)
-        .hide()
-        .html(content)
-        .fadeIn("slow");
+      /*
+        Things to do when the module is started.
+      */
     },
 
-    // This runs when the module is destroyed.
     destroy: function() {
-      $(this.element).fadeOut("slow", function(){
-        $(this).html("");
-      });
+      /*
+        Things to do when the module is destroyed.
+      */
     }
 
   }, { dataAttribute: "article" });

@@ -10,26 +10,34 @@
 
   <h1>Introduction</h1>
 
-  <p class="intro">One challenge when developing JavaScript heavy web sites/applications is to organize them in a good way.
-  Modularity.js approaches this problem with the help of a couple of great JavaScript projects and then add some own ideas
-  on top of that.</p>
-
-  <h2>About this documentation</h2>
-  <p>
-    This site is built with Modularity.js, and are in itself an example of how Modularity.js works. Please,
-    <a href="https://github.com/Jonasson/Modularity.js/tree/gh-pages">take a look at the source</a> if you are curious
-    and want an example.
-  </p>
-  <p>
-    Just as the project itself, this documentation is in a rough state. Expect a lot of Swenglish and quirky behavior...
+  <p class="intro">
+    One big challenge when developing JavaScript heavy web sites/applications is to organize them in a
+    good way. Modularity.js approaches this problem with the help of a couple of great JavaScript projects and then adds
+    some own ideas on top of that.
   </p>
 
-  <h2>Declarative</h2>
-  <p>The idea is to declare more things in your markup. This is an example:</p>
+  <p>There are two core ideas Modularity is built upon worth mentioning: modularity and declarative programming.
+
+  <h2>Modularity</h2>
+  <p>
+    <a href="http://en.wikipedia.org/wiki/Modularity">Modularity</a> is such an important idea, it gave this project its
+    name. The hope is that modularity will let you organize your code in a way that both lets you reuse more code, and
+    to avoid that wall we all have run into. The wall that hits you in your face when your project have been a headache
+    to continue with. When all the fun ends.
+  </p>
+
+  <h2>Declarative Programming</h2>
+  <p>
+    The definition of <a href="http://en.wikipedia.org/wiki/Declarative_programming">declarative programming</a> is maybe
+    a bit vague. When we talk about Modularity.js we essentially mean that you tell when a module should be used, and
+    maybe set some options, via simple data-attributes directly in the markup. When you create a module, you define a
+    <a href="http://ejohn.org/blog/html-5-data-attributes/">custom data attribute</a> associated with it. In the example
+    below there are modules associated with the "data-controller", "data-article" and "data-menu" attributes.
+  </p>
 
   <pre><code class="html">&lt;html lang="en"&gt;
   &lt;head&gt;
-    &lt;title&gt;Silly Example&lt;/title&gt;
+    &lt;title&gt;Modularity.js Example&lt;/title&gt;
     .
     .
     .
@@ -64,34 +72,57 @@
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
 
+  <h2>About this documentation</h2>
+  <p>
+    This site is built with Modularity.js, and is in itself an example of how Modularity.js works. Please,
+    <a href="https://github.com/Jonasson/Modularity.js/tree/gh-pages">take a look at the source</a> if you are curious
+    and want an example of how it works.
+  </p>
+  <p>
+    Just as the project itself, this documentation is in a rough state. Expect a lot of Swenglish and quirky behavior...
+  </p>
+
   <h2>Dependencies</h2>
   <p>
-    The goal has been to minimize the dependencies to a minimum, but at this stage Modularity.js is dependent on these
-    four libraries, all good in their own way and hard to be without.
+    The goal has been to minimize the dependencies to a minimum.
   </p>
 
   <h3><a href="http://requirejs.org/">RequireJS</a></h3>
-  <p>RequireJS allows you to divide your project into smaller parts in a clever way.</p>
-
-  <h3><a href="http://documentcloud.github.com/backbone/">Backbone.js</a></h3>
-  <p>Backbone.js is a great project. Modularity.js adds a more modular thinking to the mix.</p>
-
-  <h3><a href="http://documentcloud.github.com/underscore/">Underscore.js</a></h3>
-  <p>A collection of handy functions.</p>
+  <p>
+    RequireJS allows you to divide your project into smaller parts in a clever way. You could use Modularity.js
+    without RequireJS if you want to, but it is not meant to be used that way.
+  </p>
   
   <h3><a href="http://jquery.com/">jQuery</a></h3>
-  <p>Great DOM manipulation.</p>
+  <p>Great DOM manipulation. There is a hard dependency on this framework and Modularity.js will not work without it.</p>
 
   <h2>Other inspiration</h2>
   <ul>
     <li>
       <a href="http://developer.yahoo.com/yui/theater/video.php?v=zakas-architecture">Zakas modular architecture</a>
+      <p>
+        This video is probably what got it started, even though Modularity.js is quite different from the code Zaka
+        shows here. The sandbox was a part of Modularity.js in its earliest incarnations, but was eventually dropped.
+        You could probably offer similar functionality via RequireJS.
+      </p>
     </li>
     <li>
       <a href="http://knockoutjs.com/">Knockout</a>
+      <p>
+        The way Knockout handles attribute values is beautiful. Modularity.js uses JSON strings which is not optimized
+        to be embedded in HTML attributes, but you must start with something...
+      </p>
     </li>
   </ul>
 
+  <h2>Cross-Browser Compatibility</h2>
+  <p>
+    Modularity.js is not properly Cross-Browser tested yet. So far tested on:
+    <ul>
+      <li>Firefox 3.6+</li>
+      <li>Chrome 11</li>
+    </ul>
+  </p>
 
 </body>
 </html>
