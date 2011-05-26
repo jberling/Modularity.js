@@ -4,12 +4,10 @@
 
   <title>Enhancer/Module Tests</title>
   
-  <link rel="stylesheet" type="text/css" href="../../admin-static/test/qunit.css"/>
+  <link rel="stylesheet" type="text/css" href="qunit.css"/>
 
   <script src="scripts/lib/qunit.js"></script>
   <script src="scripts/lib/jquery.js"></script>
-  <script src="scripts/lib/underscore.js"></script>
-  <script src="scripts/lib/backbone.js"></script>
   <script src="scripts/lib/require.js"></script>
 
   <script>
@@ -24,11 +22,13 @@
 
           var modularity;
 
+          window.Modularity = Modularity;
+
           module("Basic functionality", {
 
             setup: function(){
               modularity = new Modularity();
-
+              
               Modularity.moduleDefinitions.register("foo-module", {
                 prepare: function(){
                   this.prepared = true;
