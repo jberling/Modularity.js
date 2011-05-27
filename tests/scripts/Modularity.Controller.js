@@ -1,117 +1,104 @@
-define(["./Modularity"], function(Modularity){
-
-  var parseRouteSpecs = function(str){
-    // ex: kurt:call-me.status
-    var splitted = str.split(".");
-
-    if (splitted.length === 2) {
-      var key    = splitted[0];
-      var method = splitted[1];
-    } else {
-      key = str;
-      method = null;
-    }
-
-    splitted = key.split(":");
-    if (splitted.length === 2) {
-      var id = splitted[0];
-      var modDefKey = splitted[1];
-    } else {
-      throw new Error("The module key should be in the form [element id]:[definition-name]");
-    }
-
-    return { key: key, elementId:id, moduleDefinitionKey:modDefKey, method:method };
-  };
-
-  var extensions = {
-
-    start : function(routeSpecs, context){
-      var routes           = {};
-      var methods          = {};
-      var monitoredModules = {};
-      var specs            = context.modularity.moduleSpecs
-
-      _(routeSpecs).each(function(routeSpec, routeName){
-        var methodName = "_" + routeName;
-        var routeSpecsObjArr = _.map(routeSpec, parseRouteSpecs);
-
-        _.forEach(routeSpecsObjArr, function(item){
-          monitoredModules[item.key] = true;
-        });
-
-        methods[methodName] = function(){
-          var started = [];
-          var args = arguments;
-          // start modules
-          _(routeSpecsObjArr).each(function(item){
-            var spec = specs[item.key];
-            new spec.Definition(
-              context.modularity,
-              item.key,
-              spec.context
-              ).start(spec.options, spec.context);
-            started.push(item.key);
-
-            if(item.method){
-              var module = context.modularity.modules[item.key];
-              module[item.method].apply(module, args);
-            }
+(function() {
+  define(["./Modularity"], function(Modularity) {
+    var Controller, extensions, parseRouteSpecs, staticExtensions;
+    parseRouteSpecs = function(str) {
+      var id, key, method, modDefKey, splitted;
+      splitted = str.split(".");
+      if (splitted.length === 2) {
+        key = splitted[0];
+        method = splitted[1];
+      } else {
+        key = str;
+        method = null;
+      }
+      splitted = key.split(":");
+      if (splitted.length === 2) {
+        id = splitted[0];
+        modDefKey = splitted[1];
+      } else {
+        throw new Error("the module key should be in the form [element-id]:[definition-name]");
+      }
+      return {
+        key: key,
+        elementId: id,
+        moduleDefinitionKey: modDefKey,
+        method: method
+      };
+    };
+    extensions = {
+      start: function(routeSpecs, context) {
+        var BackboneController, key, keyIsMonitored, methods, monitoredKeys, monitoredModules, routes, spec, specs, _results;
+        routes = {};
+        methods = {};
+        monitoredModules = {};
+        specs = context.modularity.moduleSpecs;
+        _(routeSpecs).each(function(routeSpec, routeName) {
+          var methodName, routeSpecsObjArr;
+          methodName = "_" + routeName;
+          routeSpecsObjArr = _.map(routeSpec, parseRouteSpecs);
+          _(routeSpecsObjArr).each(function(item) {
+            return monitoredModules[item.key] = true;
           });
-
-          // destroy modules
-          _(monitoredModules).chain().keys()
-            .reject(function(key){
-              return _(started).detect(function(startedKey){
-                return startedKey === key;
-              });
-            })
-            .each(function(key){
-              var toDestroy = context.modularity.modules[key];
-              if (toDestroy) {
-                toDestroy.destroy();
+          methods[methodName] = function() {
+            var args, started;
+            started = [];
+            args = arguments;
+            _(routeSpecsObjArr).each(function(item) {
+              var module, spec;
+              spec = specs[item.key];
+              new spec.Definition(context.modularity, item.key, spec.context).start(spec.options, spec.context);
+              if (item.method) {
+                module = context.modularity.modules[item.key];
+                return module[item.method].apply(module, args);
               }
             });
-        };
-
-        routes[routeName] = methodName;
-      });
-
-      window.methods = methods;
-
-      for (var key in context.modularity.moduleSpecs){
-        var monitoredKeys  = _.keys(monitoredModules);
-        var keyIsMonitored = _.detect(monitoredKeys, function(monitoredKey){
-          return key === monitoredKey;
+            return _(monitoredModules).chain().keys().reject(function(key) {
+              return _(started).detect(function(startedKey) {
+                return startedKey === key;
+              });
+            }).each(function(key) {
+              var toDestroy;
+              toDestroy = context.modularity.modules[key];
+              if (toDestroy) {
+                return toDestroy.destroy();
+              }
+            });
+          };
+          return routes[routeName] = methodName;
         });
-        if (!keyIsMonitored && !context.modularity.modules[key]) {
-          var spec = specs[key];
-          new spec.Definition(context.modularity, key, spec.context).start(spec.options, spec.context);
+        window.methods = methods;
+        _results = [];
+        for (key in context.modularity.moduleSpecs) {
+          monitoredKeys = _.keys(monitoredModules);
+          keyIsMonitored = _(monitoredKeys).detect(function(monitoredKey) {
+            return key === monitoredKey;
+          });
+          if (!keyIsMonitored && !context.modularity.modules[key]) {
+            spec = specs[key];
+            new spec.Definition(context.modularity, key, spec.context).start(spec.options, spec.context);
+          }
+          BackboneController = Backbone.Controller.extend(_.extend(methods, {
+            routes: routes
+          }));
+          this.backboneController = new BackboneController();
+          _results.push(_.keys(this.backboneController.routes).length ? Backbone.history.start() : void 0);
         }
+        return _results;
       }
-
-      var BackboneController = Backbone.Controller.extend(_.extend(methods, {routes:routes}));
-      this.backboneController = new BackboneController();
-      
-      if (_.keys(this.backboneController.routes).length) {
-        Backbone.history.start();
-      }
-    }
-  };
-
-  var staticExtensions = { dataAttribute : "controller" };
-
-  var Controller = Modularity.moduleDefinitions.register("controller", extensions, staticExtensions);
-
-  Controller.version = "0.1";
-
-  Modularity.prototype.startController = function(id){
-    var key = id + ":controller";
-    var spec = this.moduleSpecs[key];
-    var controller = new spec.Definition(this, key, spec.context);
-    controller.start(spec.options);
-    return controller;
-  }
-
-  return Controller;
-
-});
+    };
+    staticExtensions = {
+      dataAttribute: "controller",
+      version: "0.2.0"
+    };
+    Controller = Modularity.moduleDefinitions.register("controller", extensions, staticExtensions);
+    Modularity.prototype.startController = function(id) {
+      var controller, key, spec;
+      key = id + ":controller";
+      spec = this.moduleSpecs[key];
+      controller = new spec.Definition(this, key, spec.context);
+      controller.start(spec.options);
+      return controller;
+    };
+    return Controller;
+  });
+}).call(this);
