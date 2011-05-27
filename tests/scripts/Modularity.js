@@ -76,12 +76,11 @@
             return $(sel, context).each(function() {
               var modId, options;
               options = parseOptions($(this).attr(attr));
-              modId = this.id + ":" + defId;
-              context = {
-                element: this
-              };
+              modId = "" + this.id + ":" + defId;
               return modularity.moduleSpecs[modId] = {
-                context: context,
+                context: {
+                  element: this
+                },
                 options: options,
                 Definition: ModDef
               };

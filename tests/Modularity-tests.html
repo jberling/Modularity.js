@@ -2,7 +2,7 @@
 <html>
 <head>
 
-  <title>Enhancer/Module Tests</title>
+  <title>Modularity.js Core Tests</title>
   
   <link rel="stylesheet" type="text/css" href="qunit.css"/>
 
@@ -115,6 +115,11 @@
                   this.name    = options.name;
                 }
               }, { dataAttribute : "call-me" });
+              Modularity.moduleDefinitions.register("other", {
+                start: function(options, context){
+                  this.name = "other"
+                }
+              }, { dataAttribute : "other" });
               modularity = new Modularity({ context: $("#qunit-fixture").get(0) });
               modularity.parseContext();
             },
@@ -128,6 +133,7 @@
             ok(modularity.moduleSpecs["sixten:call-me"]);
             equals(modularity.moduleSpecs["sixten:call-me"].options.name, "Sixten");
             ok(modularity.modules["sixten:call-me"] === undefined);
+            ok(modularity.moduleSpecs["other:other"]);
           });
 
           test("Module is created, started, options is parsed and context is set", function(){
@@ -159,8 +165,10 @@
   <div id="qunit-fixture">
 
     <div id="sixten" data-call-me='{ "name" : "Sixten" }'></div>
+    <div id="other"  data-other='{}'></div>
     <div id="ove"    data-call-me='{ "name" : "Ove"    }'></div>
     <div id="kurt"   data-call-me='{ "name" : "Kurt"   }'></div>
+    <div id="benji"  data-other='{ "name" : "benji" }'></div>
 
   </div>
 

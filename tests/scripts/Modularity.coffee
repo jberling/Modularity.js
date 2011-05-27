@@ -44,20 +44,19 @@ define () ->
 
       for key, attrKey of Modularity.dataAttributes
         do (key, attrKey) ->
-          attr   = "data-" + attrKey
-          sel    = "[" + attr + "]"
+          attr   = "data-#{ attrKey }"
+          sel    = "[#{ attr }]"
           defId  = Modularity.dataAttributes[attrKey]
           ModDef = Modularity.moduleDefinitions.get(defId)
-          $(sel, context).each(
-            () ->
-              options = parseOptions($(this).attr(attr))
-              modId   = this.id + ":" + defId
-              context = {element:this}
-              modularity.moduleSpecs[modId] =
-                context    : context
-                options    : options
-                Definition : ModDef
-          )
+
+          $(sel, context).each () ->
+            options = parseOptions($(this).attr(attr))
+            modId   = "#{ this.id }:#{ defId }"
+            modularity.moduleSpecs[modId] =
+              context    :
+                element : this
+              options    : options
+              Definition : ModDef
 
     createSpecifiedModules : () ->
       modularity = this
