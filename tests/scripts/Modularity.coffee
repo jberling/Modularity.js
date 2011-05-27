@@ -10,18 +10,25 @@ define () ->
 
 
   class DefaultModule
-    constructor: (modularity, key, context) ->
+    constructor: (@modularity, key, context) ->
       started = false
       
-      modularity.modules[key] = this
+      @modularity.modules[key] = this
       context                 = context or {}
       context.modularity      = modularity
+
+      @_start   = @_start or ->
+      @_destroy = @_destroy or ->
 
       @id      = key
       @element = context.element
       @context = context
       @prepare = @prepare or ->
       @prepare(context)
+
+    destroy : () ->
+      @_destroy.apply(this, [])
+      @modularity.modules[@id] = undefined
 
     start : (options, context) ->
       unless @started
@@ -78,7 +85,10 @@ define () ->
             class NewModule extends DefaultModule
               for k, v of extensions
                 do (k, v) ->
-                  memberName = if k is "start" then "_start" else k
+                  memberName =
+                    if k is "start" then "_start"
+                    else if k is "destroy" then "_destroy"
+                    else k
                   NewModule::[memberName] = v
               for k, v of staticExtensions
                 do (k, v) ->

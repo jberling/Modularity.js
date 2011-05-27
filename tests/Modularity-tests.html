@@ -20,7 +20,7 @@
 
         require.ready(function(){
 
-          var modularity;
+          var modularity, destroyed;
 
           window.Modularity = Modularity;
 
@@ -28,7 +28,7 @@
 
             setup: function(){
               modularity = new Modularity();
-              
+              destroyed = false;
               Modularity.moduleDefinitions.register("foo-module", {
                 prepare: function(){
                   this.prepared = true;
@@ -36,6 +36,9 @@
                 start: function(options){
                   this.started  = options.started;
                   this.extended = options.extended;
+                },
+                destroy: function(){
+                  destroyed = true;
                 }
               });
 
@@ -81,6 +84,13 @@
             var foo = modularity.modules["my-module"];
             foo.start({ started: "twice"});
             equals(foo.started, true);
+          });
+
+          test("Module is destroyed", function(){
+            var foo = modularity.modules["my-module"];
+            foo.destroy();
+            ok(modularity.modules["my-module"] === undefined, "The module is removed");
+            ok(destroyed, "The destroy function is run");
           });
 
           test("Context.options is extended by options when module is started", function(){

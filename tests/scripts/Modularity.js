@@ -28,16 +28,23 @@
     DefaultModule = (function() {
       function DefaultModule(modularity, key, context) {
         var started;
+        this.modularity = modularity;
         started = false;
-        modularity.modules[key] = this;
+        this.modularity.modules[key] = this;
         context = context || {};
         context.modularity = modularity;
+        this._start = this._start || function() {};
+        this._destroy = this._destroy || function() {};
         this.id = key;
         this.element = context.element;
         this.context = context;
         this.prepare = this.prepare || function() {};
         this.prepare(context);
       }
+      DefaultModule.prototype.destroy = function() {
+        this._destroy.apply(this, []);
+        return this.modularity.modules[this.id] = void 0;
+      };
       DefaultModule.prototype.start = function(options, context) {
         if (!this.started) {
           this.started = true;
@@ -121,7 +128,7 @@
               __extends(NewModule, DefaultModule);
               _fn = function(k, v) {
                 var memberName;
-                memberName = k === "start" ? "_start" : k;
+                memberName = k === "start" ? "_start" : k === "destroy" ? "_destroy" : k;
                 return NewModule.prototype[memberName] = v;
               };
               for (k in extensions) {
