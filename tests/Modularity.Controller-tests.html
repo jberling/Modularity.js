@@ -27,6 +27,7 @@
           Modularity.moduleDefinitions.register("call-me", {
             start: function(options, context){
               this.name = options.name;
+              console.log("%s started", options.name)
             },
             status: function(str) {
               this.currentStatus = str;
