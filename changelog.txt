@@ -2,9 +2,10 @@
 
 Core:
 - Rewritten in CoffeScript
+- Some small issues (description in git)
 
 Controller:
--
+- Rewritten in CoffeeScript
 
 JsHref
 - added
