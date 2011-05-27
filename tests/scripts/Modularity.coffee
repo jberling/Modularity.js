@@ -11,40 +11,36 @@ define () ->
 
   class DefaultModule
     constructor: (modularity, key, context) ->
-      module  = this
-      start   = module.start or ->
       started = false
       
-      modularity.modules[key] = module
+      modularity.modules[key] = this
       context                 = context or {}
       context.modularity      = modularity
 
-      module.id      = key
-      module.element = context.element
-      module.context = context
-
-      module.prepare = module.prepare or ->
-
-      module.prepare(context)
+      @id      = key
+      @element = context.element
+      @context = context
+      @prepare = @prepare or ->
+      @prepare(context)
 
     start : (options, context) ->
       unless @started
         @started = true
         options = $.extend(@context.options, options)
         context = $.extend(@context, context)
-        @start.apply(this, [options, context])
+        @_start.apply(this, [options, context])
 
 
   class Modularity
     constructor: (options) ->
-      mod             = this
-      mod.config      = $.extend({ context: window.document or null }, options)
-      mod.modules     = {}
-      mod.moduleSpecs = {}
+      @config      = $.extend({ context: window.document or null }, options)
+      @modules     = {}
+      @moduleSpecs = {}
 
     parseContext : () ->
+      modularity   = this
       parseOptions = (str) -> JSON.parse str
-      context      = mod.config.context
+      context      = modularity.config.context
 
       for key, attrKey of Modularity.dataAttributes
         do (key, attrKey) ->
@@ -57,17 +53,17 @@ define () ->
               options = parseOptions($(this).attr(attr))
               modId   = this.id + ":" + defId
               context = {element:this}
-              mod.moduleSpecs[modId] = {
+              modularity.moduleSpecs[modId] =
                 context    : context
                 options    : options
                 Definition : ModDef
-              }
           )
 
     createSpecifiedModules : () ->
-      for key, spec of mod.moduleSpecs
-        do spec ->
-          new spec.Definition(mod, key, spec.context).start(spec.options, spec.context)
+      modularity = this
+      for key, spec of modularity.moduleSpecs
+        do (key, spec) ->
+          new spec.Definition(modularity, key, spec.context).start(spec.options, spec.context)
 
     @version : "0.2"
 
@@ -83,7 +79,8 @@ define () ->
             class NewModule extends DefaultModule
               for k, v of extensions
                 do (k, v) ->
-                  NewModule::[k] = v
+                  memberName = if k is "start" then "_start" else k
+                  NewModule::[memberName] = v
               for k, v of staticExtensions
                 do (k, v) ->
                   NewModule[k] = v

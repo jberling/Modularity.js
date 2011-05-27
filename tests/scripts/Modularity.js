@@ -27,45 +27,42 @@
     };
     DefaultModule = (function() {
       function DefaultModule(modularity, key, context) {
-        var module, start, started;
-        module = this;
-        start = module.start || function() {};
+        var started;
         started = false;
-        modularity.modules[key] = module;
+        modularity.modules[key] = this;
         context = context || {};
         context.modularity = modularity;
-        module.id = key;
-        module.element = context.element;
-        module.context = context;
-        module.prepare = module.prepare || function() {};
-        module.prepare(context);
+        this.id = key;
+        this.element = context.element;
+        this.context = context;
+        this.prepare = this.prepare || function() {};
+        this.prepare(context);
       }
       DefaultModule.prototype.start = function(options, context) {
         if (!this.started) {
           this.started = true;
           options = $.extend(this.context.options, options);
           context = $.extend(this.context, context);
-          return this.start.apply(this, [options, context]);
+          return this._start.apply(this, [options, context]);
         }
       };
       return DefaultModule;
     })();
     return Modularity = (function() {
       function Modularity(options) {
-        var mod;
-        mod = this;
-        mod.config = $.extend({
+        this.config = $.extend({
           context: window.document || null
         }, options);
-        mod.modules = {};
-        mod.moduleSpecs = {};
+        this.modules = {};
+        this.moduleSpecs = {};
       }
       Modularity.prototype.parseContext = function() {
-        var attrKey, context, key, parseOptions, _ref, _results;
+        var attrKey, context, key, modularity, parseOptions, _ref, _results;
+        modularity = this;
         parseOptions = function(str) {
           return JSON.parse(str);
         };
-        context = mod.config.context;
+        context = modularity.config.context;
         _ref = Modularity.dataAttributes;
         _results = [];
         for (key in _ref) {
@@ -83,7 +80,7 @@
               context = {
                 element: this
               };
-              return mod.moduleSpecs[modId] = {
+              return modularity.moduleSpecs[modId] = {
                 context: context,
                 options: options,
                 Definition: ModDef
@@ -94,14 +91,15 @@
         return _results;
       };
       Modularity.prototype.createSpecifiedModules = function() {
-        var key, spec, _ref, _results;
-        _ref = mod.moduleSpecs;
+        var key, modularity, spec, _ref, _results;
+        modularity = this;
+        _ref = modularity.moduleSpecs;
         _results = [];
         for (key in _ref) {
           spec = _ref[key];
-          _results.push(spec(function() {
-            return new spec.Definition(mod, key, spec.context).start(spec.options, spec.context);
-          })());
+          _results.push((function(key, spec) {
+            return new spec.Definition(modularity, key, spec.context).start(spec.options, spec.context);
+          })(key, spec));
         }
         return _results;
       };
@@ -123,7 +121,9 @@
               }
               __extends(NewModule, DefaultModule);
               _fn = function(k, v) {
-                return NewModule.prototype[k] = v;
+                var memberName;
+                memberName = k === "start" ? "_start" : k;
+                return NewModule.prototype[memberName] = v;
               };
               for (k in extensions) {
                 v = extensions[k];
