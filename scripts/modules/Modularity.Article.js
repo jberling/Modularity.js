@@ -1,25 +1,22 @@
-define(["./Modularity", "articles/articles"], function(Modularity, articles) {
-
-  return Modularity.moduleDefinitions.register("article", {
-
-    start: function(options) {
-      var articleName = this.id.split(":")[0];
-      var content = articles[options.name || articleName];
-      $(this.element)
-        .hide()
-        .html(content)
-        .fadeIn("slow");
-      hljs.initHighlighting.called = false;
-      hljs.initHighlighting();
-    },
-
-    destroy: function() {
-      $(this.element)
-        .fadeOut("slow", function(){
-          $(this).html("");
+(function() {
+  define(["./Modularity"], function(Modularity, articles) {
+    return Modularity.moduleDefinitions.register("article", {
+      start: function(options) {
+        var path, self;
+        self = this;
+        path = options.path || ("articles/" + (this.key.split(":")[0]) + ".html");
+        return require(["text!" + path + "!strip"], function(content) {
+          return $(self.element).hide().html(content).fadeIn("slow");
         });
-    }
-
-  }, { dataAttribute: "article" });
-
-});
+      },
+      destroy: function() {
+        return $(this.element).fadeOut("slow", function() {
+          return $(this).html("");
+        });
+      }
+    }, {
+      dataAttribute: "article",
+      VERSION: "0.2.0"
+    });
+  });
+}).call(this);

@@ -1,156 +1,212 @@
-//todo: add license info and better comments
-
-define(function(){
-
-  var getAccName = function() {
-    var registered = {};
-    return function(name){
-      var i = name in registered ? registered[name] : 1;
-      registered[name] = i + 1;
-      var uniqueName = name + (i > 1 ? i : "");
-      
-      return uniqueName;
-    };
-  }();
-
-  var Modularity = function(options){
-
-    var mod = this;
-    
-    mod.version = "0.1";
-
-    mod.config = $.extend({
-      context        : window.document || null
-    }, options);
-
-    mod.modules     = {};
-    mod.moduleSpecs = {};
-
-    mod.parseContext = function(){
-      var parseOptions = function(str){
-        return JSON.parse(str);
-      };
-
-      var context = mod.config.context;
-
-      for (var key in Modularity.dataAttributes){
-        (function(){
-          var attrKey = Modularity.dataAttributes[key];
-          var attr    = "data-" + attrKey;
-          var sel     = "[" + attr + "]";
-          var defId   = Modularity.dataAttributes[attrKey];
-          var ModDef  = Modularity.moduleDefinitions.get(defId);
-          $(sel, context).each(function(){
-            var options = parseOptions($(this).attr(attr));
-            var modId   = this.id + ":" + defId;
-            var context = { element : this };
-            mod.moduleSpecs[modId] = {
-              context    : context,
-              options    : options,
-              Definition : ModDef
-            }
-          });
-        }());
-      }
-    };
-
-    mod.createSpecifiedModules = function(){
-      for (var key in mod.moduleSpecs){
-        (function(){
-          var spec = mod.moduleSpecs[key];
-          new spec.Definition(mod, key, spec.context).start(spec.options, spec.context)
-        }());
-      }
-    };
-
-  };
-
-  // Stolen from backbone, thanks!
-  var inherits = function() {
-    var ctor = function(){};
-
-    return function(parent, protoProps, staticProps) {
-      var child;
-
-      if (protoProps && protoProps.hasOwnProperty('constructor')) {
-        child = protoProps.constructor;
-      } else {
-        child = function(){ return parent.apply(this, arguments); };
-      }
-
-      ctor.prototype = parent.prototype;
-      child.prototype = new ctor();
-
-      if (protoProps)  $.extend(child.prototype, protoProps);
-      if (staticProps) $.extend(child, staticProps);
-
-      child.prototype.constructor = child;
-
-      child.__super__ = parent.prototype;
-
-      return child;
-    };
-
-  }();
-
-  var protoModule = function(){};
-  Modularity._DefaultModuleDefinition = function(modularity, key, context){
-    var start   = this.start || function(){};
-    var started = false;
-
-    modularity.modules[key] = this;
-    context                 = context || {};
-    context.modularity      = modularity;
-    this.id                 = key;
-    this.element            = context.element;
-    this.context            = context;
-    this.prepare            = this.prepare || function(){};
-
-    this.prepare(context);
-
-    this.start = function(options, context){
-      if(!started) {
-        started = true;
-        options = $.extend(this.context.options, options);
-        context = $.extend(this.context, context);
-        start.apply(this, [options, context]);
-      }
-    };
-
-    this.destroy = this.destroy || function(){
-      delete modularity.modules[key];
-    };
-  };
-
-  Modularity.dataAttributes = {};
-
-  Modularity.moduleDefinitions = function(){
-
-    var definitions = {};
-
-    return {
-      get : function(key){
-        return definitions[key];
-      },
-      register : function(key, extensions, staticExtensions) {
-        var Definition = inherits(Modularity._DefaultModuleDefinition, extensions, staticExtensions);
-        definitions[key] = Definition;
-        if(staticExtensions && staticExtensions.dataAttribute){
-          Modularity.dataAttributes[staticExtensions.dataAttribute] = key
-        }
-        return Definition;
-      },
-      _clear : function(){
-        definitions = {};
-      }
+(function() {
+  var __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
     }
-
-  }();
-
-  Modularity.reset = function(){
-    Modularity.moduleDefinitions._clear();
+    return -1;
+  }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
   };
-  
-  return Modularity;
-
-});
+  define(function() {
+    var DefaultModule, Modularity, getAccName;
+    getAccName = function() {
+      var registered;
+      registered = {};
+      return function(name) {
+        var i, uniqueName;
+        i = __indexOf.call(registered, name) >= 0 ? registered[name] : 1;
+        registered[name] = i + 1;
+        uniqueName = name + (i > 1 ? i : "");
+        return uniqueName;
+      };
+    };
+    DefaultModule = (function() {
+      function DefaultModule(modularity, key, context) {
+        var started;
+        this.modularity = modularity;
+        started = false;
+        this.modularity.modules[key] = this;
+        context = context || {};
+        context.modularity = modularity;
+        this._start = this._start || function() {};
+        this._destroy = this._destroy || function() {};
+        this.key = key;
+        this.element = context.element;
+        this.context = context;
+        this.prepare = this.prepare || function() {};
+        this.prepare(context);
+      }
+      DefaultModule.prototype.destroy = function() {
+        var keyParts;
+        this._destroy.apply(this, []);
+        this.modularity.modules[this.key] = void 0;
+        this.modularity.trigger("" + this.key + ":destroyed");
+        keyParts = this._getKeyParts();
+        if (keyParts) {
+          return this.modularity.trigger("" + keyParts.defId + ":destroyed");
+        }
+      };
+      DefaultModule.prototype.start = function(options, context) {
+        var keyParts;
+        if (!this.started) {
+          this.started = true;
+          options = $.extend(this.context.options, options);
+          context = $.extend(this.context, context);
+          this._start.apply(this, [options, context]);
+          this.modularity.trigger("" + this.key + ":started");
+          keyParts = this._getKeyParts();
+          if (keyParts) {
+            return this.modularity.trigger("" + keyParts.defId + ":started");
+          }
+        }
+      };
+      DefaultModule.prototype._getKeyParts = function() {
+        var splitted;
+        splitted = this.key.split(":");
+        if (splitted.length === 2) {
+          return {
+            elId: splitted[0],
+            defId: splitted[1]
+          };
+        } else {
+          return false;
+        }
+      };
+      return DefaultModule;
+    })();
+    return Modularity = (function() {
+      function Modularity(options) {
+        this.config = $.extend({
+          context: window.document || null
+        }, options);
+        this.modules = {};
+        this.moduleSpecs = {};
+      }
+      Modularity.prototype.parseContext = function() {
+        var attrKey, context, key, modularity, parseOptions, _ref, _results;
+        modularity = this;
+        parseOptions = function(str) {
+          return JSON.parse(str);
+        };
+        context = modularity.config.context;
+        _ref = Modularity.dataAttributes;
+        _results = [];
+        for (key in _ref) {
+          attrKey = _ref[key];
+          _results.push((function(key, attrKey) {
+            var ModDef, attr, defId, sel;
+            attr = "data-" + attrKey;
+            sel = "[" + attr + "]";
+            defId = Modularity.dataAttributes[attrKey];
+            ModDef = Modularity.moduleDefinitions.get(defId);
+            return $(sel, context).each(function() {
+              var modKey, options;
+              options = parseOptions($(this).attr(attr));
+              modKey = "" + this.id + ":" + defId;
+              return modularity.moduleSpecs[modKey] = {
+                context: {
+                  element: this
+                },
+                options: options,
+                Definition: ModDef
+              };
+            });
+          })(key, attrKey));
+        }
+        return _results;
+      };
+      Modularity.prototype.activateModules = function() {
+        this._createSpecifiedModules();
+        return this._startSpecifiedModules();
+      };
+      Modularity.prototype._createSpecifiedModules = function() {
+        var key, modularity, spec, _fn, _ref;
+        this._prepared = [];
+        modularity = this;
+        _ref = modularity.moduleSpecs;
+        _fn = function(key, spec) {
+          var module;
+          module = new spec.Definition(modularity, key, spec.context);
+          return modularity._prepared.push(function() {
+            return module.start(spec.options, spec.context);
+          });
+        };
+        for (key in _ref) {
+          spec = _ref[key];
+          _fn(key, spec);
+        }
+        return this._startSpecifiedModules = function() {
+          var start, _i, _len, _ref, _results;
+          _ref = this._prepared;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            start = _ref[_i];
+            _results.push(start());
+          }
+          return _results;
+        };
+      };
+      Modularity.prototype.bind = function(event, func) {
+        return $(this).bind(event, func);
+      };
+      Modularity.prototype.trigger = function(event) {
+        return $(this).trigger(event);
+      };
+      Modularity.VERSION = "0.2.0";
+      Modularity.dataAttributes = {};
+      Modularity.moduleDefinitions = (function() {
+        var definitions;
+        definitions = {};
+        return {
+          get: function(key) {
+            return definitions[key];
+          },
+          register: function(key, extensions, staticExtensions) {
+            var NewModule;
+            NewModule = (function() {
+              var k, v, _fn, _fn2;
+              function NewModule() {
+                NewModule.__super__.constructor.apply(this, arguments);
+              }
+              __extends(NewModule, DefaultModule);
+              _fn = function(k, v) {
+                var memberName;
+                memberName = k === "start" ? "_start" : k === "destroy" ? "_destroy" : k;
+                return NewModule.prototype[memberName] = v;
+              };
+              for (k in extensions) {
+                v = extensions[k];
+                _fn(k, v);
+              }
+              _fn2 = function(k, v) {
+                return NewModule[k] = v;
+              };
+              for (k in staticExtensions) {
+                v = staticExtensions[k];
+                _fn2(k, v);
+              }
+              return NewModule;
+            })();
+            definitions[key] = NewModule;
+            if (staticExtensions && staticExtensions.dataAttribute) {
+              Modularity.dataAttributes[staticExtensions.dataAttribute] = key;
+            }
+            return NewModule;
+          },
+          _clear: function() {
+            return definitions = {};
+          }
+        };
+      })();
+      Modularity.reset = function() {
+        return Modularity.moduleDefinitions._clear();
+      };
+      return Modularity;
+    })();
+  });
+}).call(this);
