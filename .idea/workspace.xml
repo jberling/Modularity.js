@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7579153c-a244-4a40-8f22-87c1c0b284cc" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/articles/about.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/text.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/tests/scripts/Modularity.Article.js.old" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/changelog.txt" afterPath="$PROJECT_DIR$/changelog.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/Modularity.Article-tests.html" afterPath="$PROJECT_DIR$/tests/Modularity.Article-tests.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/Modularity.JsHref-tests.html" afterPath="$PROJECT_DIR$/tests/Modularity.JsHref-tests.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/scripts/Modularity.Article.coffee" afterPath="$PROJECT_DIR$/tests/scripts/Modularity.Article.coffee" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/scripts/Modularity.Article.js" afterPath="$PROJECT_DIR$/tests/scripts/Modularity.Article.js" />
-    </list>
+    <list default="true" id="7579153c-a244-4a40-8f22-87c1c0b284cc" name="Default" comment="" />
     <ignored path="Modularity.js.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
