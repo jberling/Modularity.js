@@ -2,7 +2,7 @@
 <html>
 <head>
 
-  <title>jsMod.Controller-tests</title>
+  <title>jsMod.Article-tests</title>
   <link rel="stylesheet" type="text/css" href="qunit.css"/>
 
   <script src="scripts/lib/qunit.js"></script>
@@ -22,16 +22,20 @@
 
         require.ready(function(){
 
-          var modularity = new Modularity({ context: $("#qunit-fixture").get(0) });
+          var modularity = new Modularity();
           modularity.parseContext();
-          modularity.createSpecifiedModules();
+          modularity.activateModules();
 
           window.Modularity = Modularity;
           window.modularity = modularity;
 
-          test("The href attribute is updated", function(){
-            var href = $(modularity.modules["link:js-href"].element).attr("href")
-            equals(href, "#about");
+          test("Article loads html-file via path", function(){
+            equal("About", $("#about2 h1").html());
+          });
+
+          test("Article loads html-file via id", function(){
+            console.log($("#about"))
+            equal("About", $("#about h1").html());
           });
 
         });
@@ -44,9 +48,9 @@
 
 <body>
 
-  <h1 id="qunit-header">Modularity.Controller-tests</h1>
+  <h1 id="qunit-header">Modularity.Article-tests</h1>
   <p>
-    Tests Controller functionality.
+    Tests Article functionality.
   </p>
 
   <h2 id="qunit-banner"></h2>
@@ -54,9 +58,8 @@
   <h2 id="qunit-userAgent"></h2>
   <ol id="qunit-tests"></ol>
 
-  <div id="qunit-fixture">
-    <a id="link" href="about" data-js-href='{ "href" : "#about" }'>About</a>
-  </div>
+  <article id="about" data-article='{}'></article>
+  <article id="about2" data-article='{ "path" : "articles/about.html" }'></article>
 
 </body>
 </html>

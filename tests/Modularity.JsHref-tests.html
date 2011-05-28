@@ -24,7 +24,7 @@
 
           var modularity = new Modularity({ context: $("#qunit-fixture").get(0) });
           modularity.parseContext();
-          modularity.createSpecifiedModules();
+          modularity.activateModules();
 
           window.Modularity = Modularity;
           window.modularity = modularity;

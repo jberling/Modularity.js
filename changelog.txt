@@ -21,4 +21,5 @@ JsHref
 Article
 - Tests added
 - Rewritten in CoffeeScript
-- 
+- There is no need for an article loader module anymore. The article is automatically loaded from a specified path or
+  via id (articles/#{ id }.html).

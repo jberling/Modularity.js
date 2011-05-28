@@ -1,11 +1,13 @@
 (function() {
-  define(["./Modularity", "articles/articles"], function(Modularity, articles) {
+  define(["./Modularity"], function(Modularity, articles) {
     return Modularity.moduleDefinitions.register("article", {
       start: function(options) {
-        var articleName, content;
-        articleName = this.id.split(":")[0];
-        content = articles[options.name || articleName];
-        return $(this.element).hide().html(content).fadeIn("slow");
+        var path, self;
+        self = this;
+        path = options.path || ("articles/" + (this.key.split(":")[0]) + ".html");
+        return require(["text!" + path + "!strip"], function(content) {
+          return $(self.element).hide().html(content).fadeIn("slow");
+        });
       },
       destroy: function() {
         return $(this.element).fadeOut("slow", function() {
