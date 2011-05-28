@@ -16,7 +16,7 @@ define(["./Modularity"], (Modularity) ->
       modDefKey = splitted[1]
     else
       throw new Error "the module key should be in the form [element-id]:[definition-name]"
-
+    
     key                 : key
     elementId           : id
     moduleDefinitionKey : modDefKey
@@ -45,14 +45,11 @@ define(["./Modularity"], (Modularity) ->
           _(routeSpecsObjArr).each (item) ->
             spec = specs[item.key]
 
-            new spec.Definition(
-              context.modularity
-              item.key
-              spec.context
-            ).start(spec.options, spec.context)
+            module = new spec.Definition(context.modularity, item.key, spec.context)
+            module.start(spec.options, spec.context)
+            started.push item.key
 
             if item.method
-              module = context.modularity.modules[item.key]
               module[item.method].apply(module, args)
 
           # destroy modules
@@ -63,7 +60,8 @@ define(["./Modularity"], (Modularity) ->
                 startedKey is key
             .each (key) ->
               toDestroy = context.modularity.modules[key]
-              if toDestroy then toDestroy.destroy()
+              if toDestroy
+                toDestroy.destroy()
         
         routes[routeName] = methodName
 
@@ -75,13 +73,14 @@ define(["./Modularity"], (Modularity) ->
                           key is monitoredKey
         if not keyIsMonitored and not context.modularity.modules[key]
           spec = specs[key]
-          new spec.Definition(context.modularity, key, spec.context).start(spec.options, spec.context)
+          module = new spec.Definition(context.modularity, key, spec.context)
+          module.start(spec.options, spec.context)
 
-        BackboneController = Backbone.Controller.extend(_.extend(methods, { routes: routes }))
-        @backboneController = new BackboneController()
+      BackboneController = Backbone.Controller.extend(_.extend(methods, { routes: routes }))
+      @backboneController = new BackboneController()
 
-        if _.keys(this.backboneController.routes).length
-          Backbone.history.start()
+      if _.keys(this.backboneController.routes).length
+        Backbone.history.start()
 
     # end start
   #end extensions

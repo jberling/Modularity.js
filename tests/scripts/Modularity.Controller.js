@@ -27,7 +27,7 @@
     };
     extensions = {
       start: function(routeSpecs, context) {
-        var BackboneController, key, keyIsMonitored, methods, monitoredKeys, monitoredModules, routes, spec, specs, _results;
+        var BackboneController, key, keyIsMonitored, methods, module, monitoredKeys, monitoredModules, routes, spec, specs;
         routes = {};
         methods = {};
         monitoredModules = {};
@@ -46,9 +46,10 @@
             _(routeSpecsObjArr).each(function(item) {
               var module, spec;
               spec = specs[item.key];
-              new spec.Definition(context.modularity, item.key, spec.context).start(spec.options, spec.context);
+              module = new spec.Definition(context.modularity, item.key, spec.context);
+              module.start(spec.options, spec.context);
+              started.push(item.key);
               if (item.method) {
-                module = context.modularity.modules[item.key];
                 return module[item.method].apply(module, args);
               }
             });
@@ -67,7 +68,6 @@
           return routes[routeName] = methodName;
         });
         window.methods = methods;
-        _results = [];
         for (key in context.modularity.moduleSpecs) {
           monitoredKeys = _.keys(monitoredModules);
           keyIsMonitored = _(monitoredKeys).detect(function(monitoredKey) {
@@ -75,15 +75,17 @@
           });
           if (!keyIsMonitored && !context.modularity.modules[key]) {
             spec = specs[key];
-            new spec.Definition(context.modularity, key, spec.context).start(spec.options, spec.context);
+            module = new spec.Definition(context.modularity, key, spec.context);
+            module.start(spec.options, spec.context);
           }
-          BackboneController = Backbone.Controller.extend(_.extend(methods, {
-            routes: routes
-          }));
-          this.backboneController = new BackboneController();
-          _results.push(_.keys(this.backboneController.routes).length ? Backbone.history.start() : void 0);
         }
-        return _results;
+        BackboneController = Backbone.Controller.extend(_.extend(methods, {
+          routes: routes
+        }));
+        this.backboneController = new BackboneController();
+        if (_.keys(this.backboneController.routes).length) {
+          return Backbone.history.start();
+        }
       }
     };
     staticExtensions = {
