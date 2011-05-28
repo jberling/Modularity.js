@@ -64,8 +64,8 @@
             ok(modularity.modules["my-module"]);
           });
 
-          test("Module id is set", function(){
-            ok(modularity.modules["my-module"].id, "my-module");
+          test("Module key is set", function(){
+            ok(modularity.modules["my-module"].key, "my-module");
           });
 
           test("Context is set", function(){
@@ -147,11 +147,68 @@
           });
 
           test("Module is created, started, options is parsed and context is set", function(){
-            modularity.createSpecifiedModules();
+            modularity.activateModules();
             equals(modularity.modules["sixten:call-me"].name, "Sixten");
             equals(modularity.modules["sixten:call-me"].element.id, "sixten");
           });
-          
+
+          module("Events", {
+            setup : function(){
+              Modularity.moduleDefinitions.register("call-me", {
+                start: function(options, context){
+                  this.name    = options.name;
+                }
+              }, { dataAttribute : "call-me" });
+              Modularity.moduleDefinitions.register("other", {
+                start: function(options, context){
+                  this.name = "other"
+                }
+              }, { dataAttribute : "other" });
+              modularity = new Modularity({ context: $("#qunit-fixture").get(0) });
+              window.modularity = modularity
+              modularity.parseContext();
+              modularity._createSpecifiedModules();
+            },
+            teardown: function(){
+              modularity = undefined;
+              Modularity.reset();
+            }
+          });
+
+          asyncTest("Specific Module started event is triggered", function(){
+            modularity.bind("sixten:call-me:started", function(){
+              ok(true);
+              start();
+            }, 500);
+            modularity._startSpecifiedModules()
+          });
+
+          asyncTest("Specific Module destroyed event is triggered", function(){
+            modularity.bind("sixten:call-me:destroyed", function(){
+              ok(true);
+              start();
+            }, 500);
+            modularity._startSpecifiedModules()
+            modularity.modules["sixten:call-me"].destroy()
+          });
+
+          asyncTest("Module started event is triggered", function(){
+            modularity.bind("call-me:started", function(){
+              ok(true);
+              start();
+            }, 500);
+            modularity._startSpecifiedModules()
+          });
+
+          asyncTest("Module destroyed event is triggered", function(){
+            modularity.bind("call-me:destroyed", function(){
+              ok(true);
+              start();
+            }, 500);
+            modularity._startSpecifiedModules()
+            modularity.modules["sixten:call-me"].destroy()
+          });
+
         });
       }
     );

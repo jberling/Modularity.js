@@ -20,7 +20,7 @@ define () ->
       @_start   = @_start or ->
       @_destroy = @_destroy or ->
 
-      @id      = key
+      @key      = key
       @element = context.element
       @context = context
       @prepare = @prepare or ->
@@ -28,7 +28,11 @@ define () ->
 
     destroy : () ->
       @_destroy.apply(this, [])
-      @modularity.modules[@id] = undefined
+      @modularity.modules[@key] = undefined
+      @modularity.trigger("#{ @key }:destroyed")
+
+      keyParts = @_getKeyParts()
+      if keyParts then @modularity.trigger("#{ keyParts.defId }:destroyed")
 
     start : (options, context) ->
       unless @started
@@ -37,6 +41,17 @@ define () ->
         context = $.extend(@context, context)
         @_start.apply(this, [options, context])
 
+        @modularity.trigger("#{ @key }:started")
+
+        keyParts = @_getKeyParts()
+        if keyParts then @modularity.trigger("#{ keyParts.defId }:started")
+
+    _getKeyParts : () ->
+      splitted = @key.split(":")
+      if splitted.length is 2
+        elId : splitted[0], defId : splitted[1]
+      else
+        false #todo: warning?
 
   class Modularity
     constructor: (options) ->
@@ -58,20 +73,32 @@ define () ->
 
           $(sel, context).each () ->
             options = parseOptions($(this).attr(attr))
-            modId   = "#{ this.id }:#{ defId }"
-            modularity.moduleSpecs[modId] =
+            modKey  = "#{ this.id }:#{ defId }"
+            modularity.moduleSpecs[modKey] =
               context    :
                 element : this
               options    : options
               Definition : ModDef
 
-    createSpecifiedModules : () ->
+    activateModules : () ->
+      @_createSpecifiedModules()
+      @_startSpecifiedModules()
+
+    _createSpecifiedModules : () ->
+      @_prepared   = []
       modularity = this
       for key, spec of modularity.moduleSpecs
         do (key, spec) ->
-          new spec.Definition(modularity, key, spec.context).start(spec.options, spec.context)
+          module = new spec.Definition(modularity, key, spec.context)
+          modularity._prepared.push(() ->  module.start(spec.options, spec.context))
+      @_startSpecifiedModules = () ->
+        start() for start in @_prepared
 
-    @version : "0.2"
+    bind : (event, func) -> $(this).bind(event, func)
+
+    trigger : (event) -> $(this).trigger(event)
+
+    @VERSION : "0.2.0"
 
     @dataAttributes : {};
 
@@ -86,8 +113,10 @@ define () ->
               for k, v of extensions
                 do (k, v) ->
                   memberName =
-                    if k is "start" then "_start"
-                    else if k is "destroy" then "_destroy"
+                    if k is "start"
+                      "_start"
+                    else if k is "destroy"
+                      "_destroy"
                     else k
                   NewModule::[memberName] = v
               for k, v of staticExtensions

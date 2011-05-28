@@ -1,25 +1,20 @@
-define(["./Modularity", "articles/articles"], function(Modularity, articles) {
-
-  return Modularity.moduleDefinitions.register("article", {
-
-    start: function(options) {
-      var articleName = this.id.split(":")[0];
-      var content = articles[options.name || articleName];
-      $(this.element)
-        .hide()
-        .html(content)
-        .fadeIn("slow");
-      hljs.initHighlighting.called = false;
-      hljs.initHighlighting();
-    },
-
-    destroy: function() {
-      $(this.element)
-        .fadeOut("slow", function(){
-          $(this).html("");
+(function() {
+  define(["./Modularity", "articles/articles"], function(Modularity, articles) {
+    return Modularity.moduleDefinitions.register("article", {
+      start: function(options) {
+        var articleName, content;
+        articleName = this.id.split(":")[0];
+        content = articles[options.name || articleName];
+        return $(this.element).hide().html(content).fadeIn("slow");
+      },
+      destroy: function() {
+        return $(this.element).fadeOut("slow", function() {
+          return $(this).html("");
         });
-    }
-
-  }, { dataAttribute: "article" });
-
-});
+      }
+    }, {
+      dataAttribute: "article",
+      VERSION: "0.2.0"
+    });
+  });
+}).call(this);

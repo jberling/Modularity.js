@@ -87,7 +87,7 @@ define(["./Modularity"], (Modularity) ->
 
   staticExtensions =
     dataAttribute : "controller"
-    version       : "0.2.0"
+    VERSION       : "0.2.0"
 
   Controller = Modularity.moduleDefinitions.register("controller", extensions, staticExtensions)
 

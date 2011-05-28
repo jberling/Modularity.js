@@ -35,22 +35,46 @@
         context.modularity = modularity;
         this._start = this._start || function() {};
         this._destroy = this._destroy || function() {};
-        this.id = key;
+        this.key = key;
         this.element = context.element;
         this.context = context;
         this.prepare = this.prepare || function() {};
         this.prepare(context);
       }
       DefaultModule.prototype.destroy = function() {
+        var keyParts;
         this._destroy.apply(this, []);
-        return this.modularity.modules[this.id] = void 0;
+        this.modularity.modules[this.key] = void 0;
+        this.modularity.trigger("" + this.key + ":destroyed");
+        keyParts = this._getKeyParts();
+        if (keyParts) {
+          return this.modularity.trigger("" + keyParts.defId + ":destroyed");
+        }
       };
       DefaultModule.prototype.start = function(options, context) {
+        var keyParts;
         if (!this.started) {
           this.started = true;
           options = $.extend(this.context.options, options);
           context = $.extend(this.context, context);
-          return this._start.apply(this, [options, context]);
+          this._start.apply(this, [options, context]);
+          this.modularity.trigger("" + this.key + ":started");
+          keyParts = this._getKeyParts();
+          if (keyParts) {
+            return this.modularity.trigger("" + keyParts.defId + ":started");
+          }
+        }
+      };
+      DefaultModule.prototype._getKeyParts = function() {
+        var splitted;
+        splitted = this.key.split(":");
+        if (splitted.length === 2) {
+          return {
+            elId: splitted[0],
+            defId: splitted[1]
+          };
+        } else {
+          return false;
         }
       };
       return DefaultModule;
@@ -81,10 +105,10 @@
             defId = Modularity.dataAttributes[attrKey];
             ModDef = Modularity.moduleDefinitions.get(defId);
             return $(sel, context).each(function() {
-              var modId, options;
+              var modKey, options;
               options = parseOptions($(this).attr(attr));
-              modId = "" + this.id + ":" + defId;
-              return modularity.moduleSpecs[modId] = {
+              modKey = "" + this.id + ":" + defId;
+              return modularity.moduleSpecs[modKey] = {
                 context: {
                   element: this
                 },
@@ -96,20 +120,44 @@
         }
         return _results;
       };
-      Modularity.prototype.createSpecifiedModules = function() {
-        var key, modularity, spec, _ref, _results;
+      Modularity.prototype.activateModules = function() {
+        this._createSpecifiedModules();
+        return this._startSpecifiedModules();
+      };
+      Modularity.prototype._createSpecifiedModules = function() {
+        var key, modularity, spec, _fn, _ref;
+        this._prepared = [];
         modularity = this;
         _ref = modularity.moduleSpecs;
-        _results = [];
+        _fn = function(key, spec) {
+          var module;
+          module = new spec.Definition(modularity, key, spec.context);
+          return modularity._prepared.push(function() {
+            return module.start(spec.options, spec.context);
+          });
+        };
         for (key in _ref) {
           spec = _ref[key];
-          _results.push((function(key, spec) {
-            return new spec.Definition(modularity, key, spec.context).start(spec.options, spec.context);
-          })(key, spec));
+          _fn(key, spec);
         }
-        return _results;
+        return this._startSpecifiedModules = function() {
+          var start, _i, _len, _ref, _results;
+          _ref = this._prepared;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            start = _ref[_i];
+            _results.push(start());
+          }
+          return _results;
+        };
       };
-      Modularity.version = "0.2";
+      Modularity.prototype.bind = function(event, func) {
+        return $(this).bind(event, func);
+      };
+      Modularity.prototype.trigger = function(event) {
+        return $(this).trigger(event);
+      };
+      Modularity.VERSION = "0.2.0";
       Modularity.dataAttributes = {};
       Modularity.moduleDefinitions = (function() {
         var definitions;
