@@ -6,8 +6,6 @@ Core:
 - Events "module-name:started","module-name:destroyed",
   "module-key:started" and "module-key:destroyed" added.
 - bind and trigger methods added to Modularity.prototype
-- startSpecifiedModules added to Modularity.prototype. This functionality was
-  removed from Modularity.prototype.createSpecifiedModules.
 - createSpecifiedModules was renamed to activateModules and its functionality
   was divided into the two methods _createSpecifiedModules and _startSpecifiedModules.
 - DefaultModule.id was renamed to DefaultModule.key
