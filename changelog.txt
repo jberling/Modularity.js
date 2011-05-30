@@ -1,23 +1,9 @@
-0.2.0
+0.2.1
 
 Core:
-- Rewritten in CoffeScript
-- Some small issues (description in git)
-- Events "module-name:started","module-name:destroyed",
-  "module-key:started" and "module-key:destroyed" added.
-- bind and trigger methods added to Modularity.prototype
-- createSpecifiedModules was renamed to activateModules and its functionality
-  was divided into the two methods _createSpecifiedModules and _startSpecifiedModules.
-- DefaultModule.id was renamed to DefaultModule.key
 
 Controller:
-- Rewritten in CoffeeScript
 
-JsHref
-- added
+JsHref:
 
-Article
-- Tests added
-- Rewritten in CoffeeScript
-- There is no need for an article loader module anymore. The article is automatically loaded from a specified path or
-  via id (articles/#{ id }.html).
+Article:

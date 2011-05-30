@@ -14,6 +14,6 @@ define(["./Modularity"], (Modularity, articles) ->
         () -> $(this).html("")
       )
 
-  }, { dataAttribute: "article", VERSION: "0.2.0" })
+  }, { dataAttribute: "article", VERSION: "0.2.1" })
 
 )

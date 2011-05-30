@@ -157,7 +157,7 @@
       Modularity.prototype.trigger = function(event) {
         return $(this).trigger(event);
       };
-      Modularity.VERSION = "0.2.0";
+      Modularity.VERSION = "0.2.1";
       Modularity.dataAttributes = {};
       Modularity.moduleDefinitions = (function() {
         var definitions;

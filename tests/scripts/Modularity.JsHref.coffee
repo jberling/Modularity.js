@@ -17,5 +17,5 @@ define(["./Modularity"], (Modularity) ->
         )
     },
 
-    { dataAttribute : dataAttribute, VERSION : "0.2.0" }
+    { dataAttribute : dataAttribute, VERSION : "0.2.1" }
   ))
