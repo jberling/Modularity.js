@@ -8,6 +8,10 @@ require([
   $(function(){
     var modularity = new Modularity();
     window.modularity = modularity;
+    modularity.bind("article:started", function(){
+      hljs.initHighlighting.called = false;
+      hljs.initHighlighting();
+    });
     modularity.parseContext();
     modularity.startController("main-controller");
   });

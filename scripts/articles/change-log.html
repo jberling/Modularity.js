@@ -3,14 +3,14 @@
 <head>
   <title>Modularity.js&mdash;Change Log</title>
   <script>
-    window.location = "../../index.html#module";
+    window.location = "../../index.html#change-log";
   </script>
 </head>
 <body>
 
   <h1>Change Log</h1>
 
-  <table>
+  <table id="changelog">
     <caption>Change Log</caption>
     <thead>
       <tr>
@@ -19,8 +19,57 @@
     </thead>
     <tbody>
       <tr>
+        <td>0.2.0</td>
+        <td>2011-05-28</td>
+        <td>
+
+          <h2>Core</h2>
+          <ul>
+            <li>Rewritten in CoffeeScript</li>
+            <li>
+              Added events: "[module-key]:started", "[module-key]:destroyed", "[module-definition-key]:started"
+              and "[module-definition-key]:destroyed"
+            </li>
+            <li>
+              <span class="code">bind</span> and <span class="code">trigger</span> added to
+              <span class="code">Modularity.prototype</span>
+            </li>
+            <li>
+              <span class="code">Modularity.prototype.createSpecifiedModules</span> was renamed to activateModules and
+              its functionality was divided into the two methods <span class="code">_createSpecifiedModules</span> and
+              <span class="code">_startSpecifiedModules</span>.
+            </li>
+            <li>
+              <span class="code">DefaultModule.id</span> was renamed to <span class="code">DefaultModule.key</span>
+            </li>
+          </ul>
+
+          <h2>Controller Module</h2>
+          <ul>
+            <li>Rewritten in CoffeeScript</li>
+          </ul>
+
+          <h2>JsHref Module</h2>
+          <ul>
+            <li>Added</li>
+          </ul>
+
+          <h2>Article Module</h2>
+          <ul>
+            <li>Rewritten in CoffeeScript</li>
+            <li>
+              There is no need for an article module anymore. The article will be loaded from a path specified
+              via an option or via an element id.
+            </li>
+          </ul>
+
+        </td>
+      </tr>
+      
+      <tr>
         <td>0.1</td><td>2011-05-23</td><td>The first version of the project added to GitHub.</td>
       </tr>
+
     </tbody>
   </table>
 

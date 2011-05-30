@@ -79,9 +79,20 @@ nav h1 {
   list-style-type: circle;
 }
 
-th, td { padding-right: 20px; }
+#changelog th { padding-right: 20px; }
+#changelog td {
+  vertical-align: top;
+  padding: 5px 20px 5px 5px;
+}
 
-caption { display: none; }
+#changelog tbody tr { border-top: dotted 1px rgb(175, 200, 225) }
+#changelog tbody tr:first-child { border-top-style: solid; }
+#changelog caption { display: none; }
+#changelog h2 {
+  font-size: 0.8em; text-transform: uppercase;
+  line-height: 1.7em;
+  margin: 0;
+}
 
 footer {
   width: 100%;

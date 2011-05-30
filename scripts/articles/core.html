@@ -48,7 +48,7 @@
 
   <p>
     If no controller module is used, the modules must be created from the specifications in another way. It's done via
-    <span class="code">createSpecifiedModules</span>, as in the example below.
+    <span class="code">activateModules</span>, as in the example below.
   </p>
 
   <pre><code class="javascript">require([
@@ -61,7 +61,7 @@
     require.ready(function(){
       var modularity = new Modularity();
       modularity.parseContext();
-      modularity.createSpecifiedModules();
+      modularity.activateModules();
     });
   }
 );</code></pre>
