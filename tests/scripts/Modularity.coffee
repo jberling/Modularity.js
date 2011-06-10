@@ -61,7 +61,8 @@ define () ->
 
     parseContext : () ->
       modularity   = this
-      parseOptions = (str) -> JSON.parse str
+      parseOptions = (str) ->
+        JSON.parse Modularity.attribToJson str
       context      = modularity.config.context
 
       for key, attrKey of Modularity.dataAttributes
@@ -133,3 +134,13 @@ define () ->
       }
 
     @reset : () -> Modularity.moduleDefinitions._clear()
+
+    @jsonToAttrib : (str) -> str.replace /"/g, "'"
+
+    @attribToJson : (str) ->
+      if str is ""
+        "{}"
+      else
+        if /^[^\{|\[]/.exec str
+          str = "{#{ str }}"
+        str.replace /'/g, "\""

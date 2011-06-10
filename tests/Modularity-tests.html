@@ -24,6 +24,23 @@
 
           window.Modularity = Modularity;
 
+          module("JSON rewriting")
+
+          test("JSON to Mutated", function(){
+            var result = Modularity.jsonToAttrib(JSON.stringify({property:"value", prop2:"val2"}));
+            equal(result, "{'property':'value','prop2':'val2'}")
+          });
+
+          test("Mutated to JSON", function(){
+            equal(Modularity.attribToJson(""), "{}", "Emtpy string is empty object");
+
+            var result2 = Modularity.attribToJson("{'prop':'val'}");
+            equal(result2, '{"prop":"val"}', "Single quotes will be double quotes");
+
+            var result3 = Modularity.attribToJson("'prop1':'val1', 'prop2':{'prop3':true}");
+            equal(result3, '{"prop1":"val1", "prop2":{"prop3":true}}', "surrounding {} can be omitted");
+          });
+
           module("Basic functionality", {
 
             setup: function(){
@@ -231,11 +248,11 @@
 
   <div id="qunit-fixture">
 
-    <div id="sixten" data-call-me='{ "name" : "Sixten" }'></div>
-    <div id="other"  data-other='{}'></div>
-    <div id="ove"    data-call-me='{ "name" : "Ove"    }'></div>
-    <div id="kurt"   data-call-me='{ "name" : "Kurt"   }'></div>
-    <div id="benji"  data-other='{ "name" : "benji" }'></div>
+    <div id="sixten" data-call-me=" 'name':'Sixten' "></div>
+    <div id="other"  data-other=""></div>
+    <div id="ove"    data-call-me=" 'name':'Ove' "></div>
+    <div id="kurt"   data-call-me=" 'name':'Kurt' "></div>
+    <div id="benji"  data-other=" 'name':'benji' "></div>
 
   </div>
 

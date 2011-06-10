@@ -110,16 +110,16 @@
 
 
   <div id="qunit-fixture">
-    <div id="test-controller" data-controller='{
-      "all"         : [ "sixten:call-me", "ove:call-me" ],
-      "sixten"      : [ "sixten:call-me" ],
-      "ove"         : [ "ove:call-me" ],
-      "ove/:status" : [ "ove:call-me.status" ]
-    }'>
+    <div id="test-controller" data-controller="
+      'all'         : [ 'sixten:call-me', 'ove:call-me' ],
+      'sixten'      : [ 'sixten:call-me' ],
+      'ove'         : [ 'ove:call-me' ],
+      'ove/:status' : [ 'ove:call-me.status' ]
+    ">
       
-      <div id="sixten" data-call-me='{ "name" : "Sixten" }'></div>
-      <div id="ove"    data-call-me='{ "name" : "Ove"    }'></div>
-      <div id="kurt"   data-call-me='{ "name" : "Kurt"   }'></div>
+      <div id="sixten" data-call-me=" 'name' : 'Sixten' "></div>
+      <div id="ove"    data-call-me=" 'name' : 'Ove' "></div>
+      <div id="kurt"   data-call-me=" 'name' : 'Kurt' "></div>
 
     </div>
 

@@ -91,7 +91,7 @@
         var attrKey, context, key, modularity, parseOptions, _ref, _results;
         modularity = this;
         parseOptions = function(str) {
-          return JSON.parse(str);
+          return JSON.parse(Modularity.attribToJson(str));
         };
         context = modularity.config.context;
         _ref = Modularity.dataAttributes;
@@ -141,11 +141,11 @@
           _fn(key, spec);
         }
         return this._startSpecifiedModules = function() {
-          var start, _i, _len, _ref, _results;
-          _ref = this._prepared;
+          var start, _i, _len, _ref2, _results;
+          _ref2 = this._prepared;
           _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            start = _ref[_i];
+          for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+            start = _ref2[_i];
             _results.push(start());
           }
           return _results;
@@ -170,10 +170,10 @@
             var NewModule;
             NewModule = (function() {
               var k, v, _fn, _fn2;
+              __extends(NewModule, DefaultModule);
               function NewModule() {
                 NewModule.__super__.constructor.apply(this, arguments);
               }
-              __extends(NewModule, DefaultModule);
               _fn = function(k, v) {
                 var memberName;
                 memberName = k === "start" ? "_start" : k === "destroy" ? "_destroy" : k;
@@ -205,6 +205,19 @@
       })();
       Modularity.reset = function() {
         return Modularity.moduleDefinitions._clear();
+      };
+      Modularity.jsonToAttrib = function(str) {
+        return str.replace(/"/g, "'");
+      };
+      Modularity.attribToJson = function(str) {
+        if (str === "") {
+          return "{}";
+        } else {
+          if (/^[^\{|\[]/.exec(str)) {
+            str = "{" + str + "}";
+          }
+          return str.replace(/'/g, "\"");
+        }
       };
       return Modularity;
     })();
