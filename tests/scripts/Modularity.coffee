@@ -14,7 +14,6 @@ define () ->
       started = false
 
       context                       = context or {}
-      console.log(context.moduleCollection)
       context.moduleCollection      = context.moduleCollection or @modularity.modules
       context.moduleCollection[key] = this
       context.modularity            = modularity
@@ -72,10 +71,7 @@ define () ->
       modularity   = this
       parseOptions = (str) -> JSON.parse Modularity.attribToJson str
       specs        = {}
-      context      = if module
-                       $(module.element).html()
-                     else
-                       modularity.config.context
+      context      = if module then module.element else modularity.config.context
 
       #parse
       for key, attrKey of Modularity.dataAttributes
@@ -85,7 +81,7 @@ define () ->
           defId  = Modularity.dataAttributes[attrKey]
           ModDef = Modularity.moduleDefinitions.get(defId)
           
-          $(sel, context).each () ->
+          $(context).find(sel).each () ->
             options = parseOptions($(this).attr(attr))
             modKey  = "#{ this.id }:#{ defId }"
             spec =
@@ -100,7 +96,7 @@ define () ->
         module.moduleSpecs = specs
       else
         modularity.moduleSpecs = specs
-
+ 
     activateModules : () ->
       @_createSpecifiedModules().start()
 
@@ -113,13 +109,13 @@ define () ->
         do (key, spec) ->
           module = new spec.Definition(modularity, key, spec.context)
           modularity._prepared.push(() -> module.start(spec.options, spec.context))
-      start : -> start() for start in self._prepared
+      { start : -> start() for start in self._prepared }
 
     bind : (event, func) -> $(this).bind(event, func)
 
     trigger : (event) -> $(this).trigger(event)
 
-    @VERSION : "0.3.0"
+    @VERSION : "0.3.1"
 
     @dataAttributes : {};
 
@@ -153,7 +149,9 @@ define () ->
           _clear : () -> definitions = {}
       }
 
-    @reset : () -> Modularity.moduleDefinitions._clear()
+    @reset : () ->
+      Modularity.moduleDefinitions._clear()
+      Modularity.dataAttributes = {}
 
     @jsonToAttrib : (str) -> str.replace /"/g, "'"
 

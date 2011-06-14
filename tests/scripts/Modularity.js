@@ -31,7 +31,6 @@
         this.modularity = modularity;
         started = false;
         context = context || {};
-        console.log(context.moduleCollection);
         context.moduleCollection = context.moduleCollection || this.modularity.modules;
         context.moduleCollection[key] = this;
         context.modularity = modularity;
@@ -104,7 +103,7 @@
           return JSON.parse(Modularity.attribToJson(str));
         };
         specs = {};
-        context = module ? $(module.element).html() : modularity.config.context;
+        context = module ? module.element : modularity.config.context;
         _ref = Modularity.dataAttributes;
         _fn = function(key, attrKey) {
           var ModDef, attr, defId, sel;
@@ -112,7 +111,7 @@
           sel = "[" + attr + "]";
           defId = Modularity.dataAttributes[attrKey];
           ModDef = Modularity.moduleDefinitions.get(defId);
-          return $(sel, context).each(function() {
+          return $(context).find(sel).each(function() {
             var modKey, options, spec;
             options = parseOptions($(this).attr(attr));
             modKey = "" + this.id + ":" + defId;
@@ -176,7 +175,7 @@
       Modularity.prototype.trigger = function(event) {
         return $(this).trigger(event);
       };
-      Modularity.VERSION = "0.3.0";
+      Modularity.VERSION = "0.3.1";
       Modularity.dataAttributes = {};
       Modularity.moduleDefinitions = (function() {
         var definitions;
@@ -223,7 +222,8 @@
         };
       })();
       Modularity.reset = function() {
-        return Modularity.moduleDefinitions._clear();
+        Modularity.moduleDefinitions._clear();
+        return Modularity.dataAttributes = {};
       };
       Modularity.jsonToAttrib = function(str) {
         return str.replace(/"/g, "'");

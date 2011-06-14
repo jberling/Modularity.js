@@ -90,7 +90,7 @@
     };
     staticExtensions = {
       dataAttribute: "controller",
-      VERSION: "0.3"
+      VERSION: "0.3.1"
     };
     Controller = Modularity.moduleDefinitions.register("controller", extensions, staticExtensions);
     Modularity.prototype.startController = function(id) {

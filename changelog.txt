@@ -1,4 +1,4 @@
-0.3.0
+0.3.1
 
 Core:
  - The attribute values are no longer pure JSON. ' to ", "" to {} and no need for leading or trailing { and }

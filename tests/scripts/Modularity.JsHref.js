@@ -15,7 +15,7 @@
       }
     }, {
       dataAttribute: dataAttribute,
-      VERSION: "0.3"
+      VERSION: "0.3.1"
     });
   });
 }).call(this);

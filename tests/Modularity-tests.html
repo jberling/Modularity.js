@@ -152,6 +152,7 @@
               Modularity.moduleDefinitions.register("persons", {
                 start: function(options){
                   $(this.element).html("\
+                    <h1>I'm here to confuse the parser</h1>\
                     <ul>\
                       <li id='brynolf' data-person=\" 'name':'Brynolf' \"></li>\
                       <li id='gunhild' data-person=\" 'name':'Gunhild' \"></li>\
@@ -200,6 +201,7 @@
 
           module("Events", {
             setup : function(){
+              Modularity.reset();
               Modularity.moduleDefinitions.register("call-me", {
                 start: function(options, context){
                   this.name    = options.name;
@@ -213,7 +215,7 @@
               modularity = new Modularity({ context: $("#qunit-fixture").get(0) });
               window.modularity = modularity
               modularity.parseContext();
-              modularity._startSpecs = modularity._createSpecifiedModules().start;
+              modularity._startUs = modularity._createSpecifiedModules();
             },
             teardown: function(){
               modularity = undefined;
@@ -226,7 +228,7 @@
               ok(true);
               start();
             }, 500);
-            modularity._startSpecs()
+            modularity._startUs.start()
           });
 
           asyncTest("Specific Module destroyed event is triggered", function(){
@@ -234,7 +236,7 @@
               ok(true);
               start();
             }, 500);
-            modularity._startSpecs()
+            modularity._startUs.start()
             modularity.modules["sixten:call-me"].destroy()
           });
 
@@ -243,7 +245,7 @@
               ok(true);
               start();
             }, 500);
-            modularity._startSpecs()
+            modularity._startUs.start()
           });
 
           asyncTest("Module destroyed event is triggered", function(){
@@ -251,7 +253,7 @@
               ok(true);
               start();
             }, 500);
-            modularity._startSpecs()
+            modularity._startUs.start()
             modularity.modules["sixten:call-me"].destroy()
           });
 
