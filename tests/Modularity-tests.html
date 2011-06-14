@@ -142,11 +142,31 @@
                   this.name    = options.name;
                 }
               }, { dataAttribute : "call-me" });
+
               Modularity.moduleDefinitions.register("other", {
                 start: function(options, context){
                   this.name = "other"
                 }
               }, { dataAttribute : "other" });
+
+              Modularity.moduleDefinitions.register("persons", {
+                start: function(options){
+                  $(this.element).html("\
+                    <ul>\
+                      <li id='brynolf' data-person=\" 'name':'Brynolf' \"></li>\
+                      <li id='gunhild' data-person=\" 'name':'Gunhild' \"></li>\
+                    </ul>"
+                  );
+                  this.parseSelf().activateModules();
+                }
+              }, { dataAttribute : "persons" });
+
+              Modularity.moduleDefinitions.register("person", {
+                start: function(options){
+                  $(this.element).html(options.name);
+                }
+              }, { dataAttribute : "person" });
+
               modularity = new Modularity({ context: $("#qunit-fixture").get(0) });
               modularity.parseContext();
             },
@@ -169,6 +189,15 @@
             equals(modularity.modules["sixten:call-me"].element.id, "sixten");
           });
 
+          test("Nested modules are created", function(){
+            modularity.activateModules();
+            var nested = modularity.modules["nested:persons"];
+            ok(nested.moduleSpecs["gunhild:person"], "Spec is created");
+            ok(nested.modules["gunhild:person"], "Module is created");
+            var result = $(nested.modules["gunhild:person"].element).html();
+            equals(result, "Gunhild", "Module is started");
+          });
+
           module("Events", {
             setup : function(){
               Modularity.moduleDefinitions.register("call-me", {
@@ -184,7 +213,7 @@
               modularity = new Modularity({ context: $("#qunit-fixture").get(0) });
               window.modularity = modularity
               modularity.parseContext();
-              modularity._createSpecifiedModules();
+              modularity._startSpecs = modularity._createSpecifiedModules().start;
             },
             teardown: function(){
               modularity = undefined;
@@ -197,7 +226,7 @@
               ok(true);
               start();
             }, 500);
-            modularity._startSpecifiedModules()
+            modularity._startSpecs()
           });
 
           asyncTest("Specific Module destroyed event is triggered", function(){
@@ -205,7 +234,7 @@
               ok(true);
               start();
             }, 500);
-            modularity._startSpecifiedModules()
+            modularity._startSpecs()
             modularity.modules["sixten:call-me"].destroy()
           });
 
@@ -214,7 +243,7 @@
               ok(true);
               start();
             }, 500);
-            modularity._startSpecifiedModules()
+            modularity._startSpecs()
           });
 
           asyncTest("Module destroyed event is triggered", function(){
@@ -222,7 +251,7 @@
               ok(true);
               start();
             }, 500);
-            modularity._startSpecifiedModules()
+            modularity._startSpecs()
             modularity.modules["sixten:call-me"].destroy()
           });
 
@@ -253,6 +282,8 @@
     <div id="ove"    data-call-me=" 'name':'Ove' "></div>
     <div id="kurt"   data-call-me=" 'name':'Kurt' "></div>
     <div id="benji"  data-other=" 'name':'benji' "></div>
+
+    <div id="nested" data-persons=""></div>
 
   </div>
 

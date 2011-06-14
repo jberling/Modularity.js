@@ -30,13 +30,16 @@
         var started;
         this.modularity = modularity;
         started = false;
-        this.modularity.modules[key] = this;
         context = context || {};
+        console.log(context.moduleCollection);
+        context.moduleCollection = context.moduleCollection || this.modularity.modules;
+        context.moduleCollection[key] = this;
         context.modularity = modularity;
         this._start = this._start || function() {};
         this._destroy = this._destroy || function() {};
         this.key = key;
         this.element = context.element;
+        this.modules = {};
         this.context = context;
         this.prepare = this.prepare || function() {};
         this.prepare(context);
@@ -65,6 +68,13 @@
           }
         }
       };
+      DefaultModule.prototype.parseSelf = function() {
+        this.modularity.parseContext(this);
+        return this;
+      };
+      DefaultModule.prototype.activateModules = function() {
+        return this.modularity._createSpecifiedModules(this.moduleSpecs).start();
+      };
       DefaultModule.prototype._getKeyParts = function() {
         var splitted;
         splitted = this.key.split(":");
@@ -87,48 +97,55 @@
         this.modules = {};
         this.moduleSpecs = {};
       }
-      Modularity.prototype.parseContext = function() {
-        var attrKey, context, key, modularity, parseOptions, _ref, _results;
+      Modularity.prototype.parseContext = function(module) {
+        var attrKey, context, key, modularity, parseOptions, specs, _fn, _ref;
         modularity = this;
         parseOptions = function(str) {
           return JSON.parse(Modularity.attribToJson(str));
         };
-        context = modularity.config.context;
+        specs = {};
+        context = module ? $(module.element).html() : modularity.config.context;
         _ref = Modularity.dataAttributes;
-        _results = [];
+        _fn = function(key, attrKey) {
+          var ModDef, attr, defId, sel;
+          attr = "data-" + attrKey;
+          sel = "[" + attr + "]";
+          defId = Modularity.dataAttributes[attrKey];
+          ModDef = Modularity.moduleDefinitions.get(defId);
+          return $(sel, context).each(function() {
+            var modKey, options, spec;
+            options = parseOptions($(this).attr(attr));
+            modKey = "" + this.id + ":" + defId;
+            spec = {
+              context: {
+                element: this,
+                moduleCollection: module ? module.modules : modularity.modules
+              },
+              options: options,
+              Definition: ModDef
+            };
+            return specs[modKey] = spec;
+          });
+        };
         for (key in _ref) {
           attrKey = _ref[key];
-          _results.push((function(key, attrKey) {
-            var ModDef, attr, defId, sel;
-            attr = "data-" + attrKey;
-            sel = "[" + attr + "]";
-            defId = Modularity.dataAttributes[attrKey];
-            ModDef = Modularity.moduleDefinitions.get(defId);
-            return $(sel, context).each(function() {
-              var modKey, options;
-              options = parseOptions($(this).attr(attr));
-              modKey = "" + this.id + ":" + defId;
-              return modularity.moduleSpecs[modKey] = {
-                context: {
-                  element: this
-                },
-                options: options,
-                Definition: ModDef
-              };
-            });
-          })(key, attrKey));
+          _fn(key, attrKey);
         }
-        return _results;
+        if (module) {
+          return module.moduleSpecs = specs;
+        } else {
+          return modularity.moduleSpecs = specs;
+        }
       };
       Modularity.prototype.activateModules = function() {
-        this._createSpecifiedModules();
-        return this._startSpecifiedModules();
+        return this._createSpecifiedModules().start();
       };
-      Modularity.prototype._createSpecifiedModules = function() {
-        var key, modularity, spec, _fn, _ref;
+      Modularity.prototype._createSpecifiedModules = function(specs) {
+        var key, modularity, self, spec, _fn;
+        self = this;
         this._prepared = [];
         modularity = this;
-        _ref = modularity.moduleSpecs;
+        specs = specs || modularity.moduleSpecs;
         _fn = function(key, spec) {
           var module;
           module = new spec.Definition(modularity, key, spec.context);
@@ -136,19 +153,21 @@
             return module.start(spec.options, spec.context);
           });
         };
-        for (key in _ref) {
-          spec = _ref[key];
+        for (key in specs) {
+          spec = specs[key];
           _fn(key, spec);
         }
-        return this._startSpecifiedModules = function() {
-          var start, _i, _len, _ref2, _results;
-          _ref2 = this._prepared;
-          _results = [];
-          for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-            start = _ref2[_i];
-            _results.push(start());
+        return {
+          start: function() {
+            var start, _i, _len, _ref, _results;
+            _ref = self._prepared;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              start = _ref[_i];
+              _results.push(start());
+            }
+            return _results;
           }
-          return _results;
         };
       };
       Modularity.prototype.bind = function(event, func) {

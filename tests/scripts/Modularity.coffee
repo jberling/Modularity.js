@@ -12,16 +12,19 @@ define () ->
   class DefaultModule
     constructor: (@modularity, key, context) ->
       started = false
-      
-      @modularity.modules[key] = this
-      context                 = context or {}
-      context.modularity      = modularity
+
+      context                       = context or {}
+      console.log(context.moduleCollection)
+      context.moduleCollection      = context.moduleCollection or @modularity.modules
+      context.moduleCollection[key] = this
+      context.modularity            = modularity
 
       @_start   = @_start or ->
       @_destroy = @_destroy or ->
 
-      @key      = key
+      @key     = key
       @element = context.element
+      @modules = {}
       @context = context
       @prepare = @prepare or ->
       @prepare(context)
@@ -42,9 +45,15 @@ define () ->
         @_start.apply(this, [options, context])
 
         @modularity.trigger("#{ @key }:started")
-
         keyParts = @_getKeyParts()
         if keyParts then @modularity.trigger("#{ keyParts.defId }:started")
+
+    parseSelf : ->
+      @modularity.parseContext this
+      this
+
+    activateModules : ->
+      @modularity._createSpecifiedModules(@moduleSpecs).start()
 
     _getKeyParts : () ->
       splitted = @key.split(":")
@@ -59,41 +68,52 @@ define () ->
       @modules     = {}
       @moduleSpecs = {}
 
-    parseContext : () ->
+    parseContext : (module) ->
       modularity   = this
-      parseOptions = (str) ->
-        JSON.parse Modularity.attribToJson str
-      context      = modularity.config.context
+      parseOptions = (str) -> JSON.parse Modularity.attribToJson str
+      specs        = {}
+      context      = if module
+                       $(module.element).html()
+                     else
+                       modularity.config.context
 
+      #parse
       for key, attrKey of Modularity.dataAttributes
         do (key, attrKey) ->
           attr   = "data-#{ attrKey }"
           sel    = "[#{ attr }]"
           defId  = Modularity.dataAttributes[attrKey]
           ModDef = Modularity.moduleDefinitions.get(defId)
-
+          
           $(sel, context).each () ->
             options = parseOptions($(this).attr(attr))
             modKey  = "#{ this.id }:#{ defId }"
-            modularity.moduleSpecs[modKey] =
+            spec =
               context    :
                 element : this
+                moduleCollection : if module then module.modules else modularity.modules
               options    : options
               Definition : ModDef
+            specs[modKey] = spec
+
+      if module
+        module.moduleSpecs = specs
+      else
+        modularity.moduleSpecs = specs
 
     activateModules : () ->
-      @_createSpecifiedModules()
-      @_startSpecifiedModules()
+      @_createSpecifiedModules().start()
 
-    _createSpecifiedModules : () ->
-      @_prepared   = []
+    _createSpecifiedModules : (specs) ->
+      self       = this
+      @_prepared = []
       modularity = this
-      for key, spec of modularity.moduleSpecs
+      specs      = specs or modularity.moduleSpecs
+      for key, spec of specs
         do (key, spec) ->
           module = new spec.Definition(modularity, key, spec.context)
-          modularity._prepared.push(() ->  module.start(spec.options, spec.context))
-      @_startSpecifiedModules = () ->
-        start() for start in @_prepared
+          modularity._prepared.push(() -> module.start(spec.options, spec.context))
+      start : -> start() for start in self._prepared
 
     bind : (event, func) -> $(this).bind(event, func)
 

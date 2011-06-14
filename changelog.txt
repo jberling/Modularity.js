@@ -2,6 +2,7 @@
 
 Core:
  - The attribute values are no longer pure JSON. ' to ", "" to {} and no need for leading or trailing { and }
+ - Modules can now be nested, via parseSelf and activateModules methods.
 
 Controller:
 
