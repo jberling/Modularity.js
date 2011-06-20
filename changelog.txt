@@ -1,10 +1,12 @@
-0.3.1
+0.3.2
 
 Core:
  - The attribute values are no longer pure JSON. ' to ", "" to {} and no need for leading or trailing { and }
  - Modules can now be nested, via parseSelf and activateModules methods.
 
 Controller:
+ - The controller now adds the route parameters to the context object.
+   They can be found in context.routeParameters as an array.
 
 JsHref:
 

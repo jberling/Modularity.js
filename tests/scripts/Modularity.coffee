@@ -115,7 +115,7 @@ define () ->
 
     trigger : (event) -> $(this).trigger(event)
 
-    @VERSION : "0.3.1"
+    @VERSION : "0.3.2"
 
     @dataAttributes : {};
 

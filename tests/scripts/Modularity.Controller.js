@@ -46,6 +46,7 @@
             _(routeSpecsObjArr).each(function(item) {
               var module, spec;
               spec = specs[item.key];
+              spec.context.routeParameters = args;
               module = new spec.Definition(context.modularity, item.key, spec.context);
               module.start(spec.options, spec.context);
               started.push(item.key);
@@ -90,7 +91,7 @@
     };
     staticExtensions = {
       dataAttribute: "controller",
-      VERSION: "0.3.1"
+      VERSION: "0.3.2"
     };
     Controller = Modularity.moduleDefinitions.register("controller", extensions, staticExtensions);
     Modularity.prototype.startController = function(id) {

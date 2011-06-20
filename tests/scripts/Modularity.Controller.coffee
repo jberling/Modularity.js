@@ -43,9 +43,9 @@ define(["./Modularity"], (Modularity) ->
 
           # start modules
           _(routeSpecsObjArr).each (item) ->
-            spec = specs[item.key]
-
-            module = new spec.Definition(context.modularity, item.key, spec.context)
+            spec                         = specs[item.key]
+            spec.context.routeParameters = args
+            module                       = new spec.Definition(context.modularity, item.key, spec.context)
             module.start(spec.options, spec.context)
             started.push item.key
 
@@ -87,7 +87,7 @@ define(["./Modularity"], (Modularity) ->
 
   staticExtensions =
     dataAttribute : "controller"
-    VERSION       : "0.3.1"
+    VERSION       : "0.3.2"
 
   Controller = Modularity.moduleDefinitions.register("controller", extensions, staticExtensions)
 

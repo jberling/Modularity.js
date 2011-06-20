@@ -26,8 +26,8 @@
 
           Modularity.moduleDefinitions.register("call-me", {
             start: function(options, context){
-              this.name = options.name;
-              console.log("%s started", options.name)
+              this.name        = options.name;
+              this.statusValue = (context.routeParameters || {})[0];
             },
             status: function(str) {
               this.currentStatus = str;
@@ -75,11 +75,25 @@
           });
 
           asyncTest("Module method should be called upon with parameters", function(){
+            var testFunc = function(){
+              equals(modularity.modules["ove:call-me"].currentStatus, "ok");
+              modularity.modules["test-controller:controller"].backboneController.unbind(
+                "route:_ove/:status",
+                testFunc
+              );
+              start();
+            }
+            modularity.modules["test-controller:controller"].backboneController.bind("route:_ove/:status",
+              testFunc
+            );
+          });
+
+          asyncTest("Module should be called upon with route parameters added to the context", function(){
             modularity.modules["test-controller:controller"].backboneController.bind("route:_ove/:status",
               function(){
-              equals(modularity.modules["ove:call-me"].currentStatus, "ok");
+              equals(modularity.modules["ove:call-me"].statusValue, "tired");
               start();
-            });
+            })
           });
 
         });
@@ -106,6 +120,7 @@
     <li><a href="#sixten">click</a></li>
     <li><a href="#ove">click</a></li>
     <li><a href="#ove/ok">click</a></li>
+    <li><a href="#ove/tired">click</a></li>
   </ol>
 
 
